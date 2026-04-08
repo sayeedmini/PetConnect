@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const vetRoutes = require('./routes/vetRoutes');
 
 const app = express();
 
@@ -12,5 +13,7 @@ app.get('/api/health', (req, res) => {
     message: 'PetConnect API is running',
   });
 });
+
+app.use('/api/vets', vetRoutes);
 
 module.exports = app;
