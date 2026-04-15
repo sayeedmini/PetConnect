@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { deleteVet, getVetById } from '../services/vetApi';
 import { getUser } from '../../auth/utils/auth';
 
@@ -44,10 +44,14 @@ function VetDetailsPage() {
   if (!vet) return <div style={{ padding: '30px' }}><p>Vet clinic not found.</p></div>;
 
   const mapUrl = `https://maps.google.com/maps?q=${vet.latitude},${vet.longitude}&z=15&output=embed`;
+  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${vet.latitude},${vet.longitude}`
+  )}`;
 
   const isOwner = currentUser?._id === vet?.owner?._id;
   const isAdmin = currentUser?.role === 'admin';
   const canManage = isOwner || isAdmin;
+  const canBook = currentUser && ['petOwner', 'admin'].includes(currentUser.role);
 
   return (
     <div style={{ padding: '30px' }}>
@@ -78,12 +82,12 @@ function VetDetailsPage() {
         referrerPolicy="no-referrer-when-downgrade"
       />
 
-      {canManage && (
-        <div style={{ display: 'flex', gap: '14px', marginTop: '18px' }}>
-          <Link to={`/vets/${vet._id}/edit`}>Edit Clinic</Link>
-          <button onClick={handleDelete}>Delete Clinic</button>
-        </div>
-      )}
+      <div style={{ display: 'flex', gap: '14px', marginTop: '18px', flexWrap: 'wrap' }}>
+        <a href={googleMapsLink} target="_blank" rel="noreferrer">Open in Google Maps</a>
+        {canBook && <Link to={`/vets/${vet._id}/book`}>Book Appointment</Link>}
+        {canManage && <Link to={`/vets/${vet._id}/edit`}>Edit Clinic</Link>}
+        {canManage && <button onClick={handleDelete}>Delete Clinic</button>}
+      </div>
     </div>
   );
 }

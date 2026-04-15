@@ -10,7 +10,7 @@ function RegisterPage() {
     name: '',
     email: '',
     password: '',
-    role: 'vet',
+    role: 'petOwner',
   });
 
   const [loading, setLoading] = useState(false);
@@ -76,11 +76,11 @@ function RegisterPage() {
           onChange={handleChange}
           required
         >
+          <option value="petOwner">Pet Owner</option>
           <option value="vet">Vet</option>
-          <option value="pet_owner">Pet Owner</option>
           <option value="groomer">Groomer</option>
           <option value="rescuer">Rescuer</option>
-          <option value="breeder">Breeder</option>
+          <option value="admin">Admin</option>
         </select>
 
         <button type="submit" disabled={loading}>

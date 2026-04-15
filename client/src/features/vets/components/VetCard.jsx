@@ -1,7 +1,14 @@
 import { Link } from 'react-router-dom';
+import { getUser } from '../../auth/utils/auth';
 
 function VetCard({ vet }) {
+  const currentUser = getUser();
+  const canEdit = currentUser && (currentUser.role === 'admin' || currentUser._id === vet?.owner?._id);
+  const canBook = currentUser && ['petOwner', 'admin'].includes(currentUser.role);
   const mapUrl = `https://maps.google.com/maps?q=${vet.latitude},${vet.longitude}&z=15&output=embed`;
+  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${vet.latitude},${vet.longitude}`
+  )}`;
 
   return (
     <div style={styles.card}>
@@ -38,7 +45,9 @@ function VetCard({ vet }) {
 
       <div style={styles.actions}>
         <Link to={`/vets/${vet._id}`}>Details</Link>
-        <Link to={`/vets/${vet._id}/edit`}>Edit</Link>
+        <a href={googleMapsLink} target="_blank" rel="noreferrer">Open in Maps</a>
+        {canBook && <Link to={`/vets/${vet._id}/book`}>Book Appointment</Link>}
+        {canEdit && <Link to={`/vets/${vet._id}/edit`}>Edit</Link>}
       </div>
     </div>
   );
@@ -88,6 +97,7 @@ const styles = {
     gap: '14px',
     marginTop: '14px',
     fontWeight: 600,
+    flexWrap: 'wrap',
   },
 };
 

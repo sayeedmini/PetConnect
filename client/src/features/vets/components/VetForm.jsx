@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createVet, updateVet } from '../services/vetApi';
 
 function VetForm({ initialData = null, isEdit = false, onSuccess }) {
@@ -14,6 +14,8 @@ function VetForm({ initialData = null, isEdit = false, onSuccess }) {
     latitude: '',
     longitude: '',
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -34,11 +36,40 @@ function VetForm({ initialData = null, isEdit = false, onSuccess }) {
     }
   }, [initialData]);
 
+  const mapUrl = useMemo(() => {
+    if (!formData.latitude || !formData.longitude) return '';
+    return `https://maps.google.com/maps?q=${formData.latitude},${formData.longitude}&z=15&output=embed`;
+  }, [formData.latitude, formData.longitude]);
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported in this browser');
+      return;
+    }
+
+    setLocationLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setFormData((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude.toFixed(6),
+          longitude: position.coords.longitude.toFixed(6),
+        }));
+        setLocationLoading(false);
+      },
+      (error) => {
+        alert(error.message || 'Failed to fetch current location');
+        setLocationLoading(false);
+      }
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -59,6 +90,8 @@ function VetForm({ initialData = null, isEdit = false, onSuccess }) {
       latitude: Number(formData.latitude),
       longitude: Number(formData.longitude),
     };
+
+    setSubmitting(true);
 
     try {
       let response;
@@ -92,6 +125,8 @@ function VetForm({ initialData = null, isEdit = false, onSuccess }) {
     } catch (error) {
       alert(error?.response?.data?.message || 'Failed to save vet clinic');
       console.error(error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -128,64 +163,94 @@ function VetForm({ initialData = null, isEdit = false, onSuccess }) {
         onChange={handleChange}
       />
 
-      <input
-        name="openTime"
-        type="time"
-        value={formData.openTime}
-        onChange={handleChange}
-        required
-      />
+      <div style={styles.timeRow}>
+        <input
+          name="openTime"
+          type="time"
+          value={formData.openTime}
+          onChange={handleChange}
+          required
+        />
 
-      <input
-        name="closeTime"
-        type="time"
-        value={formData.closeTime}
-        onChange={handleChange}
-        required
-      />
+        <input
+          name="closeTime"
+          type="time"
+          value={formData.closeTime}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
-      <input
-        name="consultationFee"
-        type="number"
-        placeholder="Consultation Fee"
-        value={formData.consultationFee}
-        onChange={handleChange}
-        required
-      />
+      <div style={styles.timeRow}>
+        <input
+          name="consultationFee"
+          type="number"
+          placeholder="Consultation Fee"
+          value={formData.consultationFee}
+          onChange={handleChange}
+          required
+        />
 
-      <input
-        name="rating"
-        type="number"
-        step="0.1"
-        min="0"
-        max="5"
-        placeholder="Rating"
-        value={formData.rating}
-        onChange={handleChange}
-      />
+        <input
+          name="rating"
+          type="number"
+          step="0.1"
+          min="0"
+          max="5"
+          placeholder="Rating"
+          value={formData.rating}
+          onChange={handleChange}
+        />
+      </div>
 
-      <input
-        name="latitude"
-        type="number"
-        step="any"
-        placeholder="Latitude"
-        value={formData.latitude}
-        onChange={handleChange}
-        required
-      />
+      <div style={styles.timeRow}>
+        <input
+          name="latitude"
+          type="number"
+          step="any"
+          placeholder="Latitude"
+          value={formData.latitude}
+          onChange={handleChange}
+          required
+        />
 
-      <input
-        name="longitude"
-        type="number"
-        step="any"
-        placeholder="Longitude"
-        value={formData.longitude}
-        onChange={handleChange}
-        required
-      />
+        <input
+          name="longitude"
+          type="number"
+          step="any"
+          placeholder="Longitude"
+          value={formData.longitude}
+          onChange={handleChange}
+          required
+        />
+      </div>
 
-      <button type="submit">
-        {isEdit ? 'Update Vet Clinic' : 'Add Vet Clinic'}
+      <button type="button" onClick={handleUseCurrentLocation} disabled={locationLoading}>
+        {locationLoading ? 'Getting current location...' : 'Use Current Location'}
+      </button>
+
+      {mapUrl ? (
+        <iframe
+          title="clinic-location-preview"
+          src={mapUrl}
+          style={styles.map}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+      ) : (
+        <div style={styles.mapPlaceholder}>
+          Add latitude and longitude to preview the clinic location on Google Maps.
+        </div>
+      )}
+
+      <button type="submit" disabled={submitting}>
+        {submitting
+          ? isEdit
+            ? 'Updating...'
+            : 'Saving...'
+          : isEdit
+          ? 'Update Vet Clinic'
+          : 'Add Vet Clinic'}
       </button>
     </form>
   );
@@ -195,8 +260,28 @@ const styles = {
   form: {
     display: 'grid',
     gap: '12px',
-    maxWidth: '500px',
+    maxWidth: '720px',
     marginTop: '20px',
+  },
+  timeRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gap: '12px',
+  },
+  map: {
+    width: '100%',
+    height: '300px',
+    border: 0,
+    borderRadius: '12px',
+  },
+  mapPlaceholder: {
+    minHeight: '120px',
+    display: 'grid',
+    placeItems: 'center',
+    background: '#eef2ff',
+    borderRadius: '12px',
+    padding: '16px',
+    color: '#3730a3',
   },
 };
 

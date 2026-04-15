@@ -27,7 +27,12 @@ const convertClinicPayload = (body) => {
     clinicName: body.clinicName,
     address: body.address,
     contactNumber: body.contactNumber,
-    servicesOffered: Array.isArray(body.servicesOffered) ? body.servicesOffered : [],
+    servicesOffered: Array.isArray(body.servicesOffered)
+      ? body.servicesOffered
+      : String(body.servicesOffered || '')
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
     workingHours: {
       openTime: body.openTime,
       closeTime: body.closeTime,
@@ -66,7 +71,7 @@ const addDerivedFields = (clinic) => {
 
 const getAllVetClinics = async (req, res) => {
   try {
-    const { search, service, minRating, lat, lng, radiusKm } = req.query;
+    const { search, service, minRating, lat, lng, radiusKm, ownerId } = req.query;
 
     const ratingFilter = parseNumber(minRating);
     const latitude = parseNumber(lat);
@@ -80,14 +85,18 @@ const getAllVetClinics = async (req, res) => {
     }
 
     if (service) {
-      matchStage.servicesOffered = { $regex: service, $options: 'i' };
+      matchStage.servicesOffered = { $elemMatch: { $regex: service, $options: 'i' } };
+    }
+
+    if (ownerId) {
+      matchStage.owner = ownerId;
     }
 
     if (search) {
       matchStage.$or = [
         { clinicName: { $regex: search, $options: 'i' } },
         { address: { $regex: search, $options: 'i' } },
-        { servicesOffered: { $regex: search, $options: 'i' } },
+        { servicesOffered: { $elemMatch: { $regex: search, $options: 'i' } } },
       ];
     }
 
