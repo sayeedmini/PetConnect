@@ -1,52 +1,42 @@
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
-const path = require("path");
 const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
 
+const connectDB = require("./config/db");
 const groomerRoutes = require("./routes/groomerRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 
+// Initialize Express
 const app = express();
 const server = http.createServer(app);
+
+// Socket.io for real-time groomer tracking
 const io = new Server(server, {
-  cors: {
-    origin: "*", // Adjust this in production
-    methods: ["GET", "POST", "PUT", "DELETE"]
-  }
+  cors: { origin: process.env.CLIENT_URL || "http://localhost:5173" },
 });
 
-app.use(cors());
+// Middleware
+app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json());
-// Increase limit for base64 if needed, but we are using multer
-app.use(express.urlencoded({ extended: true }));
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Connect to MongoDB
+connectDB();
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
-
+// Routes
 app.use("/api/groomers", groomerRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-// Socket.io for Real-time Groomer Tracking
+// Socket.io — Live Tracking
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  // Join a specific booking room
   socket.on("join-booking", (bookingId) => {
     socket.join(bookingId);
-    console.log(`Socket ${socket.id} joined room ${bookingId}`);
   });
 
-  // Receive location update from Groomer and broadcast to room
-  socket.on("groomer-location-update", (data) => {
-    const { bookingId, coordinates } = data;
-    // Broadcast to everyone in the room except the sender
+  socket.on("groomer-location-update", ({ bookingId, coordinates }) => {
     socket.to(bookingId).emit("location-updated", coordinates);
   });
 
@@ -55,7 +45,6 @@ io.on("connection", (socket) => {
   });
 });
 
+// Start Server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
