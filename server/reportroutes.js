@@ -1,6 +1,7 @@
 const express = require("express");
-const router = express.Router();
 const multer = require("multer");
+const path = require("path");
+
 const {
   createReport,
   getOpenReports,
@@ -8,24 +9,48 @@ const {
   acceptReport,
   rejectReport,
   completeReport,
+  updateTracking,
+  getTrackingByRescueId,
+  getActiveTrackingReports,
+  getMonthlyRescueStats,
+  markAsSuccessStory,
+  getSuccessStories,
+  removeSuccessStory,
 } = require("../controllers/reportcontroller");
 
+const router = express.Router();
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: function (req, file, cb) {
     cb(null, "uploads/");
   },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
 const upload = multer({ storage });
 
-router.post("/", upload.array("media"), createReport);
+router.post("/", upload.array("media", 5), createReport);
+
 router.get("/open", getOpenReports);
 router.get("/accepted", getAcceptedReports);
-router.patch("/:rescueId/accept", acceptReport);
-router.patch("/:rescueId/reject", rejectReport);
-router.patch("/:rescueId/complete", completeReport);
+
+router.put("/:rescueId/accept", acceptReport);
+router.put("/:rescueId/reject", rejectReport);
+router.put("/:rescueId/complete", completeReport);
+
+router.put("/:rescueId/tracking", updateTracking);
+router.get("/tracking/active/all", getActiveTrackingReports);
+router.get("/:rescueId/tracking", getTrackingByRescueId);
+router.get("/monthly-stats", getMonthlyRescueStats);
+router.put(
+  "/:rescueId/success-story",
+  upload.single("image"),
+  markAsSuccessStory
+);
+router.get("/success-stories", getSuccessStories);
+router.put("/:rescueId/remove-success-story", removeSuccessStory);
 
 module.exports = router;
