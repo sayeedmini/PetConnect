@@ -5,19 +5,35 @@ import RescueRequestCard from "../components/RescueRequestCard";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const socket = io("http://localhost:5000");
+const socket = io("http://localhost:1604");
+
+const locationCache = {};
 
 const getLocationName = async (lat, lng) => {
+  const key = `${lat},${lng}`;
+
+
+  if (locationCache[key]) {
+    return locationCache[key];
+  }
+
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
     );
 
     const data = await res.json();
-    return data.display_name || "Unknown location";
+    const locationName = data.display_name || "Unknown location";
+
+    if (locationName !== "Unknown location") {
+      locationCache[key] = locationName;
+    }
+
+    return locationName;
   } catch (error) {
     console.error("Error getting location name:", error);
-    return "Unknown location";
+
+    return locationCache[key] || "Unknown location";
   }
 };
 
@@ -42,10 +58,31 @@ function RescuerDashboardPage() {
   const [requests, setRequests] = useState([]);
   const [activeRescues, setActiveRescues] = useState([]);
   const [rescuerLocation, setRescuerLocation] = useState(null);
+
   const prevNewCountRef = useRef(0);
   const audioRef = useRef(null);
+  const watchIdRef = useRef(null);
+  const activeRescuesRef = useRef([]);
+  const hasFetchedReportsRef = useRef(false);
+  const rescuerLocationRef = useRef(null);
+
+  const [showStoryPopup, setShowStoryPopup] = useState(false);
+  const [showStoryForm, setShowStoryForm] = useState(false);
+  const [currentRescueId, setCurrentRescueId] = useState(null);
+
+  const [storyTitle, setStoryTitle] = useState("");
+  const [storyDescription, setStoryDescription] = useState("");
+  const [storyImage, setStoryImage] = useState(null);
 
   const newRequestCount = requests.filter((request) => request.isNew).length;
+
+  useEffect(() => {
+    activeRescuesRef.current = activeRescues;
+  }, [activeRescues]);
+
+  useEffect(() => {
+    rescuerLocationRef.current = rescuerLocation;
+  }, [rescuerLocation]);
 
   useEffect(() => {
     audioRef.current = new Audio("/mixkit-software-interface-start-2574.wav");
@@ -66,13 +103,13 @@ function RescuerDashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (!rescuerLocation) return;
+    if (!rescuerLocation || hasFetchedReportsRef.current) return;
 
     const fetchReports = async () => {
       try {
         const [openResponse, acceptedResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/reports/open"),
-          axios.get("http://localhost:5000/api/reports/accepted"),
+          axios.get("http://localhost:1604/api/reports/open"),
+          axios.get("http://localhost:1604/api/reports/accepted"),
         ]);
 
         const formattedOpenRequests = await Promise.all(
@@ -91,7 +128,9 @@ function RescuerDashboardPage() {
               location: locationName,
               distance: `${distance} km`,
               status: report.status,
-              isNew: Date.now() - new Date(report.createdAt).getTime() < 5 * 60 * 1000,
+              isNew:
+                Date.now() - new Date(report.createdAt).getTime() <
+                5 * 60 * 1000,
             };
           })
         );
@@ -119,6 +158,7 @@ function RescuerDashboardPage() {
 
         setRequests(formattedOpenRequests);
         setActiveRescues(formattedAcceptedRequests);
+        hasFetchedReportsRef.current = true;
       } catch (error) {
         console.error("Error fetching rescue reports:", error);
       }
@@ -128,19 +168,13 @@ function RescuerDashboardPage() {
   }, [rescuerLocation]);
 
   useEffect(() => {
-    socket.on("new_rescue_request", async (newRequest) => {
-      if (!rescuerLocation) return;
-
-      const alreadyExists = requests.some(
-        (request) => request.rescueId === newRequest.rescueId
-      );
-
-      if (alreadyExists) return;
+    const handleNewRescueRequest = async (newRequest) => {
+      if (!rescuerLocationRef.current) return;
 
       const locationName = await getLocationName(newRequest.lat, newRequest.lng);
       const distance = calculateDistance(
-        rescuerLocation.lat,
-        rescuerLocation.lng,
+        rescuerLocationRef.current.lat,
+        rescuerLocationRef.current.lng,
         newRequest.lat,
         newRequest.lng
       );
@@ -154,13 +188,23 @@ function RescuerDashboardPage() {
         isNew: true,
       };
 
-      setRequests((prev) => [formattedRequest, ...prev]);
-    });
+      setRequests((prev) => {
+        const alreadyExists = prev.some(
+          (request) => request.rescueId === newRequest.rescueId
+        );
+
+        if (alreadyExists) return prev;
+
+        return [formattedRequest, ...prev];
+      });
+    };
+
+    socket.on("new_rescue_request", handleNewRescueRequest);
 
     return () => {
-      socket.off("new_rescue_request");
+      socket.off("new_rescue_request", handleNewRescueRequest);
     };
-  }, [requests, rescuerLocation]);
+  }, []);
 
   useEffect(() => {
     if (newRequestCount > prevNewCountRef.current) {
@@ -177,11 +221,70 @@ function RescuerDashboardPage() {
     prevNewCountRef.current = newRequestCount;
   }, [newRequestCount]);
 
+  useEffect(() => {
+    const stopTracking = () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+    };
+
+    if (activeRescues.length === 0) {
+      stopTracking();
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      console.error("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    if (watchIdRef.current !== null) return;
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      async (position) => {
+        const latestLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        setRescuerLocation(latestLocation);
+
+        try {
+          await Promise.all(
+            activeRescuesRef.current.map((rescue) =>
+              axios.put(
+                `http://localhost:1604/api/reports/${rescue.rescueId}/tracking`,
+                {
+                  currentRescuerLat: latestLocation.lat,
+                  currentRescuerLng: latestLocation.lng,
+                  message: "Rescuer is on the way",
+                }
+              )
+            )
+          );
+        } catch (error) {
+          console.error("Error sending live tracking update:", error);
+        }
+      },
+      (error) => {
+        console.error("Error watching rescuer location:", error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 10000,
+      }
+    );
+
+    return () => {
+      stopTracking();
+    };
+  }, [activeRescues]);
+
   const handleAccept = async (rescueId) => {
     try {
-      await axios.patch(
-        `http://localhost:5000/api/reports/${rescueId}/accept`
-      );
+      await axios.put(`http://localhost:1604/api/reports/${rescueId}/accept`);
 
       const acceptedRequest = requests.find(
         (request) => request.rescueId === rescueId
@@ -192,10 +295,28 @@ function RescuerDashboardPage() {
       );
 
       if (acceptedRequest) {
-        setActiveRescues((prev) => [
-          { ...acceptedRequest, status: "Accepted", isNew: false },
-          ...prev,
-        ]);
+        const updatedAcceptedRequest = {
+          ...acceptedRequest,
+          status: "Accepted",
+          isNew: false,
+        };
+
+        setActiveRescues((prev) => [updatedAcceptedRequest, ...prev]);
+
+        if (rescuerLocation) {
+          try {
+            await axios.put(
+              `http://localhost:1604/api/reports/${rescueId}/tracking`,
+              {
+                currentRescuerLat: rescuerLocation.lat,
+                currentRescuerLng: rescuerLocation.lng,
+                message: "Rescuer accepted and started moving",
+              }
+            );
+          } catch (error) {
+            console.error("Error sending initial tracking update:", error);
+          }
+        }
       }
     } catch (error) {
       console.error("Error accepting report:", error);
@@ -205,9 +326,7 @@ function RescuerDashboardPage() {
 
   const handleReject = async (rescueId) => {
     try {
-      await axios.patch(
-        `http://localhost:5000/api/reports/${rescueId}/reject`
-      );
+      await axios.put(`http://localhost:1604/api/reports/${rescueId}/reject`);
 
       setRequests((prev) =>
         prev.filter((request) => request.rescueId !== rescueId)
@@ -220,18 +339,52 @@ function RescuerDashboardPage() {
 
   const handleComplete = async (rescueId) => {
     try {
-      await axios.patch(
-        `http://localhost:5000/api/reports/${rescueId}/complete`
-      );
+      await axios.put(`http://localhost:1604/api/reports/${rescueId}/complete`);
 
       setActiveRescues((prev) =>
         prev.filter((request) => request.rescueId !== rescueId)
       );
+
+      setCurrentRescueId(rescueId);
+      setShowStoryPopup(true);
+      setShowStoryForm(false);
+
     } catch (error) {
       console.error("Error completing report:", error);
       toast.error("Failed to complete rescue.");
     }
   };
+
+  const handleSubmitStory = async () => {
+  try {
+    const formData = new FormData();
+
+    formData.append("storyTitle", storyTitle);
+    formData.append("storyDescription", storyDescription);
+
+    if (storyImage) {
+      formData.append("image", storyImage);
+    }
+
+    await axios.put(
+      `http://localhost:1604/api/reports/${currentRescueId}/success-story`,
+      formData
+    );
+
+    toast.success("Success story added!");
+
+    setShowStoryPopup(false);
+    setShowStoryForm(false);
+
+    setStoryTitle("");
+    setStoryDescription("");
+    setStoryImage(null);
+  } catch (error) {
+    console.error("Error saving story:", error);
+    toast.error("Failed to save story");
+  }
+ };
+
 
   const handleMarkAsSeen = (rescueId) => {
     setRequests((prev) =>
@@ -409,6 +562,232 @@ function RescuerDashboardPage() {
           )}
         </div>
       </div>
+      {showStoryPopup && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.28)",
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 999,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "460px",
+              backgroundColor: "rgba(255, 255, 255, 0.56)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid rgba(255,255,255,0.35)",
+              borderRadius: "20px",
+              padding: "24px",
+              boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+            }}
+          >
+            {!showStoryForm ? (
+              <>
+                <h3
+                  style={{
+                    margin: "0 0 10px 0",
+                    color: "#1f2937",
+                    fontSize: "26px",
+                    textAlign: "center",
+                  }}
+                >
+                  Rescue Completed
+                </h3>
+
+                <p
+                  style={{
+                    margin: "0 0 22px 0",
+                    color: "#6b7280",
+                    textAlign: "center",
+                    fontSize: "15px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  Do you want to add this rescue as a success story?
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    onClick={() => setShowStoryForm(true)}
+                    style={{
+                      backgroundColor: "#256eeb",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "10px",
+                      padding: "10px 18px",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      boxShadow: "0 6px 16px rgba(37, 99, 235, 0.25)",
+                    }}
+                  >
+                    Add Story
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowStoryPopup(false);
+                      setShowStoryForm(false);
+                      setStoryTitle("");
+                      setStoryDescription("");
+                      setStoryImage(null);
+                    }}
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.55)",
+                      color: "#111827",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      borderRadius: "10px",
+                      padding: "10px 18px",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3
+                  style={{
+                    margin: "0 0 16px 0",
+                    color: "#1f2937",
+                    fontSize: "24px",
+                    textAlign: "center",
+                  }}
+                >
+                  Add Success Story
+                </h3>
+
+                <input
+                  type="text"
+                  placeholder="Enter story title"
+                  value={storyTitle}
+                  onChange={(e) => setStoryTitle(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    marginBottom: "12px",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    backgroundColor: "rgba(255,255,255,0.55)",
+                    color: "#111827",
+                    outline: "none",
+                    fontSize: "14px",
+                    boxSizing: "border-box",
+                  }}
+                />
+
+                <textarea
+                  placeholder="Enter story description"
+                  value={storyDescription}
+                  onChange={(e) => setStoryDescription(e.target.value)}
+                  rows={4}
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    marginBottom: "12px",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    backgroundColor: "rgba(255,255,255,0.55)",
+                    color: "#111827",
+                    outline: "none",
+                    fontSize: "14px",
+                    resize: "vertical",
+                    boxSizing: "border-box",
+                  }}
+                />
+
+                <div
+                  style={{
+                    marginBottom: "16px",
+                    padding: "12px 14px",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    backgroundColor: "rgba(255,255,255,0.55)",
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setStoryImage(e.target.files[0])}
+                    style={{
+                      width: "100%",
+                      fontSize: "14px",
+                      color: "#111827",
+                    }}
+                  />
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    onClick={handleSubmitStory}
+                    style={{
+                      backgroundColor: "#16a34a",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "10px",
+                      padding: "10px 18px",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      boxShadow: "0 6px 16px rgba(22, 163, 74, 0.22)",
+                    }}
+                  >
+                    Submit
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowStoryPopup(false);
+                      setShowStoryForm(false);
+                      setStoryTitle("");
+                      setStoryDescription("");
+                      setStoryImage(null);
+                    }}
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.55)",
+                      color: "#111827",
+                      border: "1px solid rgba(255,255,255,0.35)",
+                      borderRadius: "10px",
+                      padding: "10px 18px",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <ToastContainer position="top-right" />
     </div>
