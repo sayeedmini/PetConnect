@@ -119,7 +119,7 @@ const EmergencyReportPage = () => {
       setIsSubmitting(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/reports",
+        "http://localhost:1604/api/reports",
         formData,
         {
           headers: {
@@ -154,7 +154,7 @@ const EmergencyReportPage = () => {
     <div
       style={{
         minHeight: "100vh",
-        backgroundImage: "url('/back1.avif')",
+        backgroundImage: "url('/frame-with-dogs-vector-white-background_53876-127700.avif')",
         backgroundSize: "cover", 
         backgroundPosition: "center", 
         backgroundRepeat: "no-repeat",
