@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 import {
   MapContainer,
   TileLayer,
@@ -13,6 +14,7 @@ const socket = io("http://localhost:1604");
 
 function TrackingDashboardPage() {
   const [reports, setReports] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchReports();
@@ -83,6 +85,18 @@ function TrackingDashboardPage() {
     );
   };
 
+  const navButtonStyle = {
+    border: "none",
+    borderRadius: "999px",
+    padding: "10px 20px",
+    color: "#ffffff",
+    fontWeight: "700",
+    fontSize: "14px",
+    cursor: "pointer",
+    background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+  };
+
   return (
     <div
       style={{
@@ -95,6 +109,7 @@ function TrackingDashboardPage() {
         position: "relative",
       }}
     >
+      {/* Dark overlay */}
       <div
         style={{
           position: "absolute",
@@ -111,12 +126,37 @@ function TrackingDashboardPage() {
         style={{
           position: "relative",
           zIndex: 1,
-          padding: "20px",
+          padding: "10px 20px 20px",
         }}
       >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "11px",
+          }}
+        >
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={navButtonStyle}
+          >
+          Back to Dashboard
+          </button>
+
+          <button
+            onClick={() => navigate("/rescue-insights")}
+            style={navButtonStyle}
+          >
+            Rescue Insights
+          </button>
+        </div>
+
+        {/* 🔥 ORIGINAL TITLE (unchanged) */}
         <h2 style={{ color: "white" }}>Live Rescue Dashboard</h2>
 
+        {/* Main Layout */}
         <div style={{ display: "flex", gap: "20px" }}>
+          {/* Map */}
           <div
             style={{
               flex: 2,
@@ -144,7 +184,6 @@ function TrackingDashboardPage() {
                     </Popup>
                   </Marker>
 
-                  {/* Rescuer live location */}
                   {r.currentRescuerLat && (
                     <Marker
                       position={[
@@ -160,6 +199,7 @@ function TrackingDashboardPage() {
             </MapContainer>
           </div>
 
+          {/* Active Rescues */}
           <div
             style={{
               flex: 1,
@@ -174,15 +214,7 @@ function TrackingDashboardPage() {
               overflowY: "auto",
             }}
           >
-            <h3
-              style={{
-                marginBottom: "15px",
-                fontWeight: "600",
-                letterSpacing: "0.5px",
-              }}
-            >
-              Active Rescues
-            </h3>
+            <h3 style={{ marginBottom: "15px" }}>Active Rescues</h3>
 
             {reports.map((r) => {
               const filteredLogs = [];
@@ -298,9 +330,11 @@ function TrackingDashboardPage() {
                             <div style={{ fontWeight: "600" }}>
                               {log.eventType}
                             </div>
+
                             <div style={{ opacity: 0.85 }}>
                               {log.message}
                             </div>
+
                             <div
                               style={{
                                 opacity: 0.6,

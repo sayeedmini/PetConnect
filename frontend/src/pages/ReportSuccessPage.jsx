@@ -15,9 +15,10 @@ const ReportSuccessPage = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: "url('/frame-with-dogs-vector-white-background_53876-127700.avif')",
-        backgroundSize: "cover", 
-        backgroundPosition: "center", 
+        backgroundImage:
+          "url('/frame-with-dogs-vector-white-background_53876-127700.avif')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         padding: "24px",
         fontFamily: "Arial, sans-serif",
@@ -147,23 +148,50 @@ const ReportSuccessPage = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => navigate("/dashboard")}
+        <div
           style={{
-            padding: "14px 24px",
-            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "12px",
-            cursor: "pointer",
-            fontWeight: "700",
-            fontSize: "16px",
-            boxShadow: "0 10px 25px rgba(37, 99, 235, 0.25)",
-            transition: "0.2s ease",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          Go to Dashboard
-        </button>
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{
+              padding: "14px 24px",
+              background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "12px",
+              cursor: "pointer",
+              fontWeight: "700",
+              fontSize: "16px",
+              boxShadow: "0 10px 25px rgba(37, 99, 235, 0.25)",
+              transition: "0.2s ease",
+            }}
+          >
+            Dashboard
+          </button>
+
+          <button
+            onClick={() => navigate("/tracking")}
+            style={{
+              marginTop: "14px",
+              padding: "14px 24px",
+              background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "12px",
+              cursor: "pointer",
+              fontWeight: "700",
+              fontSize: "16px",
+              boxShadow: "0 10px 25px rgba(47, 111, 143, 0.25)",
+              transition: "0.2s ease",
+            }}
+          >
+            Track My Rescue
+          </button>
+        </div>
       </div>
     </div>
   );

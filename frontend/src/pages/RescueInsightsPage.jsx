@@ -1,8 +1,11 @@
 import React from "react";
 import MonthlyRescueStats from "../components/MonthlyRescueStats";
 import SuccessStoriesGallery from "../components/SuccessStoriesGallery";
+import { useNavigate } from "react-router-dom";
 
 function RescueInsightsPage() {
+  const navigate = useNavigate();
+
   return (
     <div
       style={{
@@ -63,6 +66,32 @@ function RescueInsightsPage() {
 
         <MonthlyRescueStats />
         <SuccessStoriesGallery />
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "30px",
+            paddingBottom: "10px",
+          }}
+        >
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{
+              padding: "14px 26px",
+              background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "12px",
+              cursor: "pointer",
+              fontWeight: "700",
+              fontSize: "16px",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+            }}
+          >
+           Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );

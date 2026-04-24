@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import RescueRequestCard from "../components/RescueRequestCard";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const socket = io("http://localhost:1604");
 
@@ -75,6 +76,7 @@ function RescuerDashboardPage() {
   const [storyImage, setStoryImage] = useState(null);
 
   const newRequestCount = requests.filter((request) => request.isNew).length;
+  const navigate = useNavigate();
 
   useEffect(() => {
     activeRescuesRef.current = activeRescues;
@@ -408,6 +410,70 @@ function RescuerDashboardPage() {
         padding: "40px 20px",
       }}
     >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px 20px",
+        marginBottom: "10px",
+      }}
+    >
+      {/* LEFT GLASS BUTTON */}
+      <div
+        style={{
+          padding: "8px",
+          borderRadius: "999px",
+          backgroundColor: "rgba(255,255,255,0.25)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+        }}
+      >
+        <button
+          onClick={() => navigate("/dashboard")}
+          style={{
+            padding: "10px 18px",
+            background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "999px",
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "14px",
+          }}
+        >
+        Back To Dashboard
+        </button>
+      </div>
+
+      {/* RIGHT GLASS BUTTON */}
+      <div
+        style={{
+          padding: "8px",
+          borderRadius: "999px",
+          backgroundColor: "rgba(255,255,255,0.25)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+        }}
+      >
+        <button
+          onClick={() => navigate("/tracking")}
+          style={{
+            padding: "10px 18px",
+            background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "999px",
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "14px",
+          }}
+        >
+          Track The Rescue
+        </button>
+      </div>
+    </div>
       <div
         style={{
           maxWidth: "900px",

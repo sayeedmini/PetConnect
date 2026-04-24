@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { loginUser } from "../services/authApi";
+import { saveAuth } from "../utils/auth";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -38,6 +40,12 @@ const EmergencyReportPage = () => {
   const [showMap, setShowMap] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [showRescuerLogin, setShowRescuerLogin] = useState(false);
+  const [rescuerEmail, setRescuerEmail] = useState("");
+  const [rescuerPassword, setRescuerPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginData, setLoginData] = useState({ email: '', password: '', });
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -88,6 +96,50 @@ const EmergencyReportPage = () => {
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  const handleOpenRescuerLogin = () => {
+    setLoginError("");
+    setShowRescuerLogin(true);
+  };
+
+  const handleCloseRescuerLogin = () => {
+    setShowRescuerLogin(false);
+    setRescuerEmail("");
+    setRescuerPassword("");
+    setLoginError("");
+  };
+
+  const handleLoginChange = (e) => {
+  setLoginData((prev) => ({
+    ...prev,
+    [e.target.name]: e.target.value,
+  }));
+  };
+
+  const handleRescuerLogin = async (e) => {
+    e.preventDefault();
+
+    if (!loginData.email || !loginData.password) {
+      alert("Please enter email and password");
+      return;
+    }
+
+    try {
+      const data = await loginUser(loginData);  
+
+      if (data.user.role !== "rescuer") {
+        setLoginError("Only rescuers can access the rescuer dashboard.");
+        return;
+      }
+
+      saveAuth(data.token, data.user); 
+
+      navigate("/rescuer-dashboard");
+
+    } catch (error) {
+      setLoginError(error?.response?.data?.message || "Login failed");
     }
   };
 
@@ -147,20 +199,111 @@ const EmergencyReportPage = () => {
     }
   };
 
-  const selectedPosition =
-    lat !== null && lng !== null ? [lat, lng] : null;
+  const selectedPosition = lat !== null && lng !== null ? [lat, lng] : null;
+
+  const floatingButtonStyle = {
+    border: "none",
+    borderRadius: "999px",
+    padding: "12px 22px",
+    color: "#ffffff",
+    fontWeight: "600",
+    fontSize: "15px",
+    cursor: "pointer",
+    background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+    transition: "all 0.2s ease",
+  };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        backgroundImage: "url('/frame-with-dogs-vector-white-background_53876-127700.avif')",
-        backgroundSize: "cover", 
-        backgroundPosition: "center", 
+        backgroundImage:
+          "url('/frame-with-dogs-vector-white-background_53876-127700.avif')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        padding: "40px 20px",
+        padding: "0 20px 40px",
       }}
     >
+      <div
+        style={{
+          width: "100%",
+          margin: "-8px 0 22px",
+          padding: "14px 18px",
+          boxSizing: "border-box",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "16px",
+          flexWrap: "nowrap",
+          position: "sticky",
+          top: "8px",
+          zIndex: 500,
+
+          backgroundColor: "rgba(255, 255, 255, 0.28)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+
+          borderRadius: "24px 24px",
+          boxShadow: "0 8px 22px rgba(0,0,0,0.08)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          style={{
+            ...floatingButtonStyle,
+            background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+          }}
+        >
+        Back to Dashboard
+        </button>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "nowrap",
+            marginLeft: "auto",
+            justifyContent: "flex-end",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => navigate("/tracking")}
+            style={{
+              ...floatingButtonStyle,
+              background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+            }}
+          >
+            Track My Rescue
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/rescue-insights")}
+            style={{
+              ...floatingButtonStyle,
+              background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+            }}
+          >
+            Rescue Insights
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenRescuerLogin}
+            style={{
+              ...floatingButtonStyle,
+              background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+            }}
+          >
+            Login as Rescuer
+          </button>
+        </div>
+      </div>
+
       <div
         style={{
           maxWidth: "700px",
@@ -176,7 +319,8 @@ const EmergencyReportPage = () => {
         </h1>
 
         <p style={{ marginBottom: "25px", color: "#374151", fontSize: "15px" }}>
-          Submit the animal’s details and location so nearby rescuers can respond.
+          Submit the animal&apos;s details and location so nearby rescuers can
+          respond.
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -312,15 +456,15 @@ const EmergencyReportPage = () => {
             </label>
 
             <p style={{ margin: "4px 0", color: "#374151" }}>
-            Lat: {lat ?? "Not set"}
+              Lat: {lat ?? "Not set"}
             </p>
 
             <p style={{ margin: "4px 0", color: "#374151" }}>
-            Lng: {lng ?? "Not set"}
+              Lng: {lng ?? "Not set"}
             </p>
 
             <p style={{ margin: "4px 0", color: "#374151" }}>
-            Source: {locationSource || "Not set"}
+              Source: {locationSource || "Not set"}
             </p>
 
             {locationError && (
@@ -404,6 +548,138 @@ const EmergencyReportPage = () => {
           </button>
         </form>
       </div>
+
+      {showRescuerLogin && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(15, 23, 42, 0.4)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "20px",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: "500px",
+              backgroundColor: "rgba(255,255,255,0.6)",
+              borderRadius: "20px",
+              padding: "28px",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            <h3
+              style={{
+                margin: "0 0 18px 0",
+                color: "#1f2937",
+                fontSize: "26px",
+                textAlign: "center",
+              }}
+            >
+              Rescuer Login
+            </h3>
+
+            {/* Email */}
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter rescuer email"
+              value={loginData.email}
+              onChange={handleLoginChange}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                marginBottom: "14px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255,255,255,0.35)",
+                backgroundColor: "rgba(255,255,255,0.7)",
+                color: "#111827",
+                outline: "none",
+                fontSize: "14px",
+                boxSizing: "border-box",
+              }}
+            />
+
+            {/* Password */}
+            <input
+              name="password"
+              type="password"
+              placeholder="Enter password"
+              value={loginData.password}
+              onChange={handleLoginChange}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                marginBottom: "16px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255,255,255,0.35)",
+                backgroundColor: "rgba(255,255,255,0.7)",
+                color: "#111827",
+                outline: "none",
+                fontSize: "14px",
+                boxSizing: "border-box",
+              }}
+            />
+
+            {loginError && (
+              <p style={{ color: "red", marginBottom: "12px" }}>
+                {loginError}
+              </p>
+            )}
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
+            >
+              {/* LOGIN BUTTON (your chosen color style) */}
+              <button
+                onClick={handleRescuerLogin}
+                style={{
+                  background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "10px",
+                  padding: "10px 20px",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+                }}
+              >
+                Login
+              </button>
+
+              {/* CANCEL */}
+              <button
+                onClick={handleCloseRescuerLogin}
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.6)",
+                  color: "#111827",
+                  border: "1px solid rgba(255,255,255,0.35)",
+                  borderRadius: "10px",
+                  padding: "10px 20px",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
