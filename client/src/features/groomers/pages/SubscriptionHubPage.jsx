@@ -3,7 +3,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import {
   User, Scissors, ChevronLeft, Check, Bell, X, Edit2, Trash2,
-  FileText, Plus, RotateCcw, AlertCircle, CheckCircle, Info, CreditCard
+  FileText, Plus, RotateCcw, AlertCircle, CheckCircle, Info, CreditCard, Sparkles, ArrowRight
 } from "lucide-react";
 import ImageWithFallback from "../components/ImageWithFallback";
 import { getGroomerAvatar } from "../utils/groomerAvatar";
@@ -358,23 +358,31 @@ const SubscriptionHub = () => {
 
   if (loading && !selectedGroomerId) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-16">
-        <div className="w-10 h-10 rounded-full border-4 border-teal-100 border-t-teal-500 animate-spin" />
+      <div className="container app-shell" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '60px',
+        background: 'var(--bg)', color: 'var(--text)',
+        '--bg': '#F7F9FB', '--surface': '#ffffff', '--text': '#002045', '--text-soft': '#0f172a', '--muted': '#334155', '--border': '#e2e8f0', '--primary': '#002045', '--primary-soft': '#84add5ff'
+      }}>
+        <div className="spinner" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-16">
+    <div className="container app-shell" style={{
+      paddingTop: '20px', paddingBottom: '60px',
+      background: 'var(--bg)', color: 'var(--text)',
+      '--bg': '#F7F9FB', '--surface': '#ffffff', '--text': '#002045', '--text-soft': '#0f172a', '--muted': '#334155', '--border': '#e2e8f0', '--primary': '#002045', '--primary-soft': '#84add5ff'
+    }}>
       {/* Page Header */}
-      <div className="border-b border-slate-100 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <div className="card" style={{ marginBottom: '24px', padding: '24px' }}>
+        <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-slate-900" style={{ fontWeight: 800, fontSize: "clamp(1.25rem, 3vw, 1.75rem)", letterSpacing: "-0.02em" }}>
+              <h1 className="page-title" style={{ margin: 0, fontSize: "clamp(1.25rem, 3vw, 1.75rem)", color: 'var(--text)' }}>
                 Subscriptions
               </h1>
-              <p className="text-slate-500 text-sm mt-0.5">Manage grooming plans for customers and groomers.</p>
+              <p className="page-subtitle" style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-soft)' }}>Manage grooming plans for customers and groomers.</p>
             </div>
             {role && (
               <button
@@ -413,29 +421,29 @@ const SubscriptionHub = () => {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {!role && (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-10">
-              <h2 className="text-slate-900 mb-2" style={{ fontWeight: 700, fontSize: "1.35rem" }}>Who are you?</h2>
-              <p className="text-slate-500 text-sm">Select your role to access the right subscription experience.</p>
+              <h2 className="text-slate-900 mb-2" style={{ fontWeight: 800, fontSize: "1.75rem" }}>Subscription Hub</h2>
+              <p className="text-slate-500 text-sm">Select your role to manage your pet care subscriptions.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <RoleCard
-                icon={<User className="w-7 h-7" />}
+                icon={<User className="w-6 h-6" />}
                 title="I'm a Customer"
                 subtitle="Browse and subscribe to grooming plans"
-                color="#0D9488"
-                bg="#CCFBF1"
+                color="#002045"
+                bg="#F0FDFA"
                 onClick={() => handleRoleSelect("customer")}
-                bullets={["Browse groomer plans", "Subscribe online", "Manage & view invoices"]}
+                bullets={["Discover local groomer plans", "Secure bKash & COD payments"]}
               />
               <RoleCard
-                icon={<Scissors className="w-7 h-7" />}
+                icon={<Scissors className="w-6 h-6" />}
                 title="I'm a Groomer"
-                subtitle="Create and manage your subscription plans"
-                color="#7C3AED"
-                bg="#EDE9FE"
+                subtitle="Design and launch custom subscription tiers"
+                color="#002045"
+                bg="#F0FDFA"
                 onClick={() => handleRoleSelect("groomer")}
-                bullets={["Create subscription plans", "Edit & delete plans", "Track your offerings"]}
+                bullets={["Create unlimited tiers", "Manage active subscribers"]}
               />
             </div>
           </div>
@@ -445,16 +453,16 @@ const SubscriptionHub = () => {
           <div className="space-y-7">
             {/* Select Groomer */}
             <Section title="Select Your Groomer" subtitle="Choose a groomer to see their available subscription plans.">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-16">
                 {groomers.map((g) => (
                   <button
                     key={g._id}
                     onClick={() => setSelectedGroomerId(g._id)}
                     className="flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all active:scale-95"
                     style={{
-                      borderColor: selectedGroomerId === g._id ? "#0D9488" : "#E2E8F0",
+                      borderColor: selectedGroomerId === g._id ? "#002045" : "#E2E8F0",
                       background: selectedGroomerId === g._id ? "#F0FDFA" : "white",
-                      boxShadow: selectedGroomerId === g._id ? "0 0 0 3px #CCFBF1" : "none",
+                      boxShadow: selectedGroomerId === g._id ? "0 0 0 3px #f4f7fb" : "none",
                     }}
                   >
                     <ImageWithFallback src={getGroomerAvatar(g)} alt={g.name} className="w-12 h-12 rounded-xl object-cover" />
@@ -462,7 +470,7 @@ const SubscriptionHub = () => {
                       <p className="text-slate-800 text-sm truncate" style={{ fontWeight: 700 }}>{g.name}</p>
                       <p className="text-slate-400 text-xs truncate">{g.address || "Location not specified"}</p>
                       {selectedGroomerId === g._id && (
-                        <span className="text-xs font-semibold" style={{ color: "#0D9488" }}>✓ Selected</span>
+                        <span className="text-xs font-semibold" style={{ color: "#002045" }}>✓ Selected</span>
                       )}
                     </div>
                   </button>
@@ -500,7 +508,7 @@ const SubscriptionHub = () => {
             {/* Active Subscriptions */}
             {subscriptions.length > 0 && (
               <Section title="Active Subscriptions" subtitle="Your current grooming subscriptions.">
-                <div className="space-y-4">
+                <div className="space-y-12">
                   {subscriptions.map((sub) => (
                     <ActiveSubCard
                       key={sub._id}
@@ -523,7 +531,7 @@ const SubscriptionHub = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div><p className="text-slate-400 text-xs">Customer</p><p className="text-slate-700 text-sm font-bold">{invoice.customerName}</p></div>
                     <div><p className="text-slate-400 text-xs">Plan</p><p className="text-slate-700 text-sm font-bold">{invoice.planTitle}</p></div>
-                    <div><p className="text-slate-400 text-xs">Amount</p><p className="text-teal-700 text-sm font-bold">৳{invoice.amount.toLocaleString()}</p></div>
+                    <div><p className="text-slate-400 text-xs">Amount</p><p className="text-[#002045] text-sm font-bold">৳{invoice.amount.toLocaleString()}</p></div>
                     <div><p className="text-slate-400 text-xs">Next Billing</p><p className="text-slate-700 text-sm font-bold">{new Date(invoice.nextBillingDate).toLocaleDateString()}</p></div>
                   </div>
                 </div>
@@ -557,22 +565,21 @@ const SubscriptionHub = () => {
                 ))}
               </div>
               {!confirmedGroomer ? (
-                <button
-                  onClick={() => { if (selectedGroomerId) { setConfirmedGroomer(true); notify("success", `Account confirmed as ${selectedGroomer?.name}.`); } }}
-                  disabled={!selectedGroomerId}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95 disabled:opacity-50"
-                  style={{ background: "#7C3AED" }}
-                >
-                  Confirm — This is My Account
-                </button>
+                  <button
+                    onClick={() => { if (selectedGroomerId) { setConfirmedGroomer(true); notify("success", `Account confirmed as ${selectedGroomer?.name}.`); } }}
+                    disabled={!selectedGroomerId}
+                    style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: !selectedGroomerId ? '#7a8ca5' : '#002045', color: '#fff', fontWeight: '700', cursor: !selectedGroomerId ? 'not-allowed' : 'pointer' }}
+                  >
+                    Confirm My Account
+                  </button>
               ) : (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 border border-violet-100">
-                  <CheckCircle className="w-5 h-5 text-violet-600" />
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#f4f7fb] border border-[#d1d5db]">
+                  <CheckCircle className="w-5 h-5 text-[#002045]" />
                   <div>
-                    <p className="text-violet-800 text-sm font-semibold">Account confirmed as {selectedGroomer?.name}</p>
-                    <p className="text-violet-500 text-xs">You can now create and manage subscription plans.</p>
+                    <p className="text-[#002045] text-sm font-semibold">Account confirmed as {selectedGroomer?.name}</p>
+                    <p className="text-[#002045] text-xs">You can now create and manage subscription plans.</p>
                   </div>
-                  <button onClick={() => setConfirmedGroomer(false)} className="ml-auto text-violet-400 hover:text-violet-600">
+                  <button onClick={() => setConfirmedGroomer(false)} className="ml-auto text-[#002045] hover:text-[#002045]">
                     <RotateCcw className="w-4 h-4" />
                   </button>
                 </div>
@@ -600,13 +607,11 @@ const SubscriptionHub = () => {
                     <textarea name="benefits" value={planForm.benefits} onChange={handlePlanChange} rows={3} placeholder={"2 grooming sessions/month\nFree nail trims\nPriority booking"} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-violet-400 transition-all text-sm resize-none" />
                   </div>
                   <div className="flex gap-3">
-                    <button type="submit" disabled={actionLoading} className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-violet-600 transition-all active:scale-95 disabled:opacity-50">
-                      {editingPlanId ? <Edit2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                      {editingPlanId ? "Update Plan" : "Create Plan"}
+                    <button type="submit" disabled={actionLoading} style={{ padding: '12px 24px', border: 'none', borderRadius: '10px', background: actionLoading ? '#7a8ca5' : '#002045', color: '#fff', fontWeight: '700', cursor: actionLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {editingPlanId ? <Edit2 className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                      {editingPlanId ? "Save Changes" : "Create Plan"}
                     </button>
-                    {editingPlanId && (
-                      <button type="button" onClick={cancelEditPlan} className="px-5 py-3 rounded-xl text-sm font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50">Cancel</button>
-                    )}
+                      <button type="button" onClick={cancelEditPlan} style={{ padding: '12px 24px', border: '1px solid #ccc', borderRadius: '10px', background: '#fff', color: '#002045', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
                   </div>
                 </form>
               </Section>
@@ -620,27 +625,27 @@ const SubscriptionHub = () => {
                     <p className="text-slate-400 text-sm">You haven't created any plans yet.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-16">
                     {plans.map((plan) => (
                       <div key={plan._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                         <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="text-slate-900" style={{ fontWeight: 700 }}>{plan.title}</h3>
-                              <span className="text-xs px-2 py-0.5 rounded-full capitalize font-medium bg-violet-50 text-violet-700">{plan.billingCycle}</span>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full capitalize font-bold bg-[#f4f7fb] text-[#002045]">{plan.billingCycle}</span>
                             </div>
-                            <p className="text-slate-500 text-xs mb-3">{plan.description}</p>
+                            <p className="text-slate-500 text-[11px] mb-3">{plan.description}</p>
                             <div className="flex flex-wrap gap-1.5">
                               {plan.benefits?.map((b, i) => (
-                                <span key={i} className="px-2.5 py-1 rounded-lg text-xs bg-violet-50 text-violet-700 font-medium">{b}</span>
+                                <span key={i} className="px-2 py-0.5 rounded-md text-[10px] bg-[#f4f7fb] text-[#002045] font-bold border border-[#d1d5db]">{b}</span>
                               ))}
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-3 shrink-0">
-                            <span style={{ fontWeight: 800, fontSize: "1.2rem", color: "#7C3AED" }}>৳{plan.price?.toLocaleString()}</span>
+                            <span style={{ fontWeight: 800, fontSize: "1.1rem", color: "#002045" }}>৳{plan.price?.toLocaleString()}</span>
                             <div className="flex gap-2">
-                              <button onClick={() => startEditPlan(plan)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-violet-100 text-violet-600 hover:bg-violet-50"><Edit2 className="w-3.5 h-3.5" /> Edit</button>
-                              <button onClick={() => deletePlan(plan._id)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-red-100 text-red-500 hover:bg-red-50"><Trash2 className="w-3.5 h-3.5" /> Delete</button>
+                              <button onClick={() => startEditPlan(plan)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-[#d1d5db] text-[#002045] hover:bg-[#f4f7fb]"><Edit2 className="w-3 h-3" /> Edit</button>
+                              <button onClick={() => deletePlan(plan._id)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-red-100 text-red-500 hover:bg-red-50"><Trash2 className="w-3 h-3" /> Delete</button>
                             </div>
                           </div>
                         </div>
@@ -661,10 +666,10 @@ const SubscriptionHub = () => {
 
 function Section({ title, subtitle, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+    <div className="card" style={{ padding: '32px' }}>
       <div className="mb-5">
-        <h2 className="text-slate-900" style={{ fontWeight: 700, fontSize: "1.05rem" }}>{title}</h2>
-        {subtitle && <p className="text-slate-400 text-xs mt-0.5">{subtitle}</p>}
+        <h2 className="page-title" style={{ fontSize: "1.15rem", color: 'var(--text)', margin: 0 }}>{title}</h2>
+        {subtitle && <p className="page-subtitle" style={{ fontSize: "0.85rem", color: 'var(--text-soft)', margin: '4px 0 0' }}>{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -675,26 +680,27 @@ function RoleCard({ icon, title, subtitle, color, bg, onClick, bullets }) {
   return (
     <button
       onClick={onClick}
-      className="group text-left p-7 rounded-2xl bg-white border-2 border-transparent hover:border-current shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 active:scale-95 w-full"
-      style={{ borderColor: "transparent" }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = color)}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "transparent")}
+      className="card hover-scale"
+      style={{ padding: '32px', textAlign: 'left', display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}
     >
-      <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: bg, color }}>
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110" style={{ background: bg, color }}>
         {icon}
       </div>
+      
       <h3 className="text-slate-900 mb-1" style={{ fontWeight: 700, fontSize: "1rem" }}>{title}</h3>
-      <p className="text-slate-500 text-xs mb-4">{subtitle}</p>
-      <ul className="space-y-1.5">
+      <p className="text-slate-500 text-[11px] mb-4 leading-relaxed">{subtitle}</p>
+      
+      <ul className="space-y-2 mb-5">
         {bullets.map((b) => (
-          <li key={b} className="flex items-center gap-2 text-xs text-slate-600">
-            <Check className="w-3.5 h-3.5 shrink-0" style={{ color }} />
+          <li key={b} className="flex items-center gap-2 text-[10px] text-slate-600 font-medium">
+            <Check className="w-3 h-3" style={{ color }} />
             {b}
           </li>
         ))}
       </ul>
-      <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold" style={{ color }}>
-        Continue <ChevronLeft className="w-4 h-4 rotate-180" />
+      
+      <div className="mt-auto flex items-center gap-1.5 text-xs font-bold transition-all duration-300 group-hover:gap-2" style={{ color }}>
+        Get Started <ArrowRight className="w-3.5 h-3.5" />
       </div>
     </button>
   );
@@ -713,20 +719,19 @@ function PlanSubscribeCard({ plan, subscriberForm, handleSubscriberChange, onSub
               {plan.billingCycle}
             </span>
           </div>
-          <span style={{ fontWeight: 800, fontSize: "1.25rem", color: "#0D9488" }}>
+          <span style={{ fontWeight: 800, fontSize: "1.25rem", color: "#002045" }}>
             ৳{plan.price?.toLocaleString()}
           </span>
         </div>
         <p className="text-slate-500 text-xs mb-3 leading-relaxed">{plan.description}</p>
         <div className="flex flex-wrap gap-1.5 mb-4">
           {plan.benefits?.map((b, i) => (
-            <span key={i} className="px-2.5 py-1 rounded-lg text-xs bg-teal-50 text-teal-700 font-medium">{b}</span>
+            <span key={i} className="px-2.5 py-1 rounded-lg text-xs bg-[#f4f7fb] text-[#002045] font-medium">{b}</span>
           ))}
         </div>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
-          style={{ background: expanded ? "#94A3B8" : "linear-gradient(135deg, #0D9488, #14B8A6)" }}
+          style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: '#002045', color: '#fff', fontWeight: '700', cursor: 'pointer' }}
         >
           {expanded ? "Close" : "Subscribe to This Plan"}
         </button>
@@ -737,11 +742,11 @@ function PlanSubscribeCard({ plan, subscriberForm, handleSubscriberChange, onSub
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-semibold text-slate-500 uppercase mb-1 block">Full Name</label>
-              <input name="subscriberName" value={subscriberForm.subscriberName} onChange={handleSubscriberChange} className="w-full px-3 py-2 rounded-lg border text-sm focus:border-teal-400 outline-none" placeholder="Sakib Al Hasan" />
+              <input name="subscriberName" value={subscriberForm.subscriberName} onChange={handleSubscriberChange} className="w-full px-3 py-2 rounded-lg border text-sm focus:border-[#002045] outline-none" placeholder="Sakib Al Hasan" />
             </div>
             <div>
               <label className="text-xs font-semibold text-slate-500 uppercase mb-1 block">Phone</label>
-              <input name="subscriberPhone" value={subscriberForm.subscriberPhone} onChange={handleSubscriberChange} className="w-full px-3 py-2 rounded-lg border text-sm focus:border-teal-400 outline-none" placeholder="01XXXXXXXXX" />
+              <input name="subscriberPhone" value={subscriberForm.subscriberPhone} onChange={handleSubscriberChange} className="w-full px-3 py-2 rounded-lg border text-sm focus:border-[#002045] outline-none" placeholder="01XXXXXXXXX" />
             </div>
           </div>
           <div>
@@ -751,7 +756,7 @@ function PlanSubscribeCard({ plan, subscriberForm, handleSubscriberChange, onSub
                 <button
                   key={opt.id}
                   onClick={() => handleSubscriberChange({ target: { name: "paymentMethod", value: opt.id } })}
-                  className={`py-2 rounded-xl text-xs font-semibold border-2 transition-all ${subscriberForm.paymentMethod === opt.id ? "bg-teal-50 border-teal-600 text-teal-700" : "bg-white border-slate-100 text-slate-500"}`}
+                  className={`py-2 rounded-xl text-xs font-semibold border-2 transition-all ${subscriberForm.paymentMethod === opt.id ? "bg-[#f4f7fb] border-[#002045] text-[#002045]" : "bg-white border-slate-100 text-slate-500"}`}
                 >
                   {opt.label}
                 </button>
@@ -761,14 +766,14 @@ function PlanSubscribeCard({ plan, subscriberForm, handleSubscriberChange, onSub
           {subscriberForm.paymentMethod === "Bkash" && (
             <div>
               <label className="text-xs font-semibold text-slate-500 uppercase mb-1 block">bKash Number</label>
-              <input name="bkashNumber" value={subscriberForm.bkashNumber} onChange={handleSubscriberChange} className="w-full px-3 py-2 rounded-lg border text-sm focus:border-teal-400 outline-none" placeholder="01XXXXXXXXX" />
+              <input name="bkashNumber" value={subscriberForm.bkashNumber} onChange={handleSubscriberChange} className="w-full px-3 py-2 rounded-lg border text-sm focus:border-[#002045] outline-none" placeholder="01XXXXXXXXX" />
             </div>
           )}
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" name="autoRenew" checked={subscriberForm.autoRenew} onChange={handleSubscriberChange} disabled={subscriberForm.paymentMethod === "COD"} />
             <span className="text-xs text-slate-600">Enable Auto-Renew {subscriberForm.paymentMethod === "COD" && "(Unavailable for COD)"}</span>
           </label>
-          <button onClick={onSubscribe} disabled={actionLoading} className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-teal-600 transition-all active:scale-95 shadow-md shadow-teal-100">
+          <button onClick={onSubscribe} disabled={actionLoading} style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: actionLoading ? '#7a8ca5' : '#002045', color: '#fff', fontWeight: '700', cursor: actionLoading ? 'not-allowed' : 'pointer' }}>
             {actionLoading ? "Processing..." : "Confirm Subscription"}
           </button>
         </div>
@@ -783,7 +788,7 @@ function ActiveSubCard({ sub, onAutoRenew, onCancel, onInvoice, onReminder, acti
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-2.5 py-1 rounded-full text-xs font-bold text-white bg-teal-600">Active</span>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold text-white bg-[#002045]">Active</span>
             <h3 className="text-slate-900" style={{ fontWeight: 700 }}>{sub.planId?.title || "Plan"}</h3>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2">

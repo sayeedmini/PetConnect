@@ -5,11 +5,11 @@
 /* --- Theme Variables (:root) --- */
 /* These variables define the "Single Source of Truth" for our colors and spacing */
 :root {
-  /* Brand Colors (Teal Palette) */
-  --color-primary: #0d9488;
-  --color-primary-hover: #0f766e;
-  --color-primary-light: #ccfbf1;
-  --color-primary-border: #99f6e4;
+  /* Brand Colors (Bluish Palette) */
+  --color-primary: #002045;
+  --color-primary-hover: #002045;
+  --color-primary-light: #f4f7fb;
+  --color-primary-border: #d1d5db;
   
   /* Status Colors */
   --color-success: #16a34a;
