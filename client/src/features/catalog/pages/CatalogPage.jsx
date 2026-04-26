@@ -37,7 +37,7 @@ function CatalogPage() {
 
     const currentUser = getUser();
     const userEmail = currentUser?.email || 'test@user.com';
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const API_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:5000/api';
 
     // Fetch products with filters
     const fetchProducts = async () => {
@@ -620,16 +620,26 @@ function CatalogPage() {
                                                     e.currentTarget.style.boxShadow = "0 10px 25px rgba(0,0,0,0.08)";
                                                 }}                                            
                                             >
-                                                <div className="card-body">
+                                                <div className="card-body d-flex flex-column">
+                                                    <div className="mb-3 overflow-hidden rounded" style={{ height: "180px" }}>
+                                                        <img 
+                                                            src={product.images?.[0] || "https://via.placeholder.com/300x200?text=Pet+Product"} 
+                                                            alt={product.name}
+                                                            className="w-100 h-100 object-fit-cover transition-all"
+                                                            style={{ transition: "0.3s" }}
+                                                            onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                                                            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                                                        />
+                                                    </div>
                                                     <span 
-                                                      className="badge mb-2"
+                                                      className="badge mb-2 align-self-start"
                                                         style={{
                                                             background: "#e0f2fe",
                                                             color: "#0284c7",
                                                             borderRadius: "8px"
                                                         }}
                                                     >{product.category}</span>
-                                                    <h5 className="card-title">{product.name}</h5>
+                                                    <h5 className="card-title text-truncate">{product.name}</h5>
                                                     <p className="card-text text-muted small">{product.brand}</p>
                                                     <div className="mb-2">
                                                         <span className="text-warning">{renderStars(product.ratings?.average || 0)}</span>
@@ -640,7 +650,7 @@ function CatalogPage() {
                                                         <strong className="h5 text-primary">৳{product.price}</strong>
                                                     </p>
                                                     <button 
-                                                        className="btn w-100 mt-2 text-white"
+                                                        className="btn w-100 mt-auto text-white"
                                                         style={{
                                                         background: "linear-gradient(135deg, #5f5aa2, #2f6f8f)",
                                                         border: "none",

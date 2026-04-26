@@ -17,7 +17,6 @@ const sectionNavItems = {
   groomers: [
     { to: '/', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
     { to: '/groomers', label: 'Groomers', match: (pathname) => pathname.startsWith('/groomers') },
-    { to: '/groomers', label: 'Bookings', match: (pathname) => pathname.startsWith('/grooming/track') || /^\/groomers\/[^/]+\/book$/.test(pathname) },
     { to: '/grooming/subscriptions', label: 'Subscription', match: (pathname) => pathname.startsWith('/grooming/subscriptions') || pathname === '/subscriptions' },
   ],
   rescue: [
@@ -93,7 +92,7 @@ function SiteLayout({
 
   return (
     <div className="min-h-screen bg-[#F7F9FB] text-slate-900">
-      <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-[100] border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-none items-center justify-between gap-4 px-1 py-4 sm:px-2 lg:px-3">
           <div className="min-w-0 shrink-0">
             <Link to="/" className="flex items-center gap-3">
@@ -203,11 +202,11 @@ function SiteLayout({
           </section>
         )}
 
-        <div className="mx-auto w-full max-w-[1700px] px-3 py-8 sm:px-4 lg:px-5">{children}</div>
+        <div className="mx-auto w-full max-w-[1700px] px-3 pt-8 pb-40 sm:px-4 lg:px-5">{children}</div>
       </main>
 
-      <footer className="mt-12 border-t border-slate-200 bg-white">
-        <div className="mx-auto grid w-full max-w-[1700px] gap-10 px-3 py-10 sm:grid-cols-2 sm:px-4 lg:grid-cols-5 lg:px-5">
+      <footer className="mt-48 border-t border-slate-200 bg-white">
+        <div className="mx-auto grid w-full max-w-[1700px] gap-10 px-3 py-20 sm:grid-cols-2 sm:px-4 lg:grid-cols-5 lg:px-5">
           <div className="lg:col-span-2">
             <div className="font-display text-2xl font-extrabold text-[#002045]">PetConnect</div>
             <p className="mt-3 max-w-md text-sm leading-7 text-slate-600">

@@ -13,7 +13,7 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 // Configuration for different booking statuses (labels, colors, and descriptions)
 const statusConfig = {
   Pending:     { label: "Pending",     color: "#64748B", bg: "#F1F5F9", desc: "Waiting for groomer to accept" },
-  Accepted:    { label: "Accepted",    color: "#0D9488", bg: "#CCFBF1", desc: "Groomer accepted your request" },
+  Accepted:    { label: "Accepted",    color: "#002045", bg: "#f4f7fb", desc: "Groomer accepted your request" },
   "On the Way":{ label: "On the Way", color: "#2563EB", bg: "#DBEAFE", desc: "Groomer is heading to your location" },
   Arrived:     { label: "Arrived",     color: "#7C3AED", bg: "#EDE9FE", desc: "Groomer has arrived at your door" },
   Completed:   { label: "Completed",   color: "#059669", bg: "#D1FAE5", desc: "Grooming session complete" },
@@ -34,7 +34,7 @@ const createCustomIcon = (label, color) =>
   });
 
 // Pre-defined icons for Destination (D) and Groomer (G)
-const destIcon = createCustomIcon("D", "#0D9488");
+const destIcon = createCustomIcon("D", "#002045");
 const groomerIcon = createCustomIcon("G", "#2563EB");
 
 /**
@@ -155,7 +155,11 @@ const LiveTracking = () => {
   const etaLabel = etaMinutes === null ? "Calculating..." : etaMinutes === 0 ? "Arrived!" : `~${etaMinutes} min`;
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-16 flex flex-col">
+    <div className="container app-shell" style={{
+      paddingTop: '20px', paddingBottom: '60px',
+      background: 'var(--bg)', color: 'var(--text)',
+      '--bg': '#F7F9FB', '--surface': '#ffffff', '--text': '#002045', '--text-soft': '#0f172a', '--muted': '#334155', '--border': '#e2e8f0', '--primary': '#002045', '--primary-soft': '#84add5ff'
+    }}>
       {/* Page Header Area */}
       <div className="bg-white border-b border-slate-100 px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -164,8 +168,8 @@ const LiveTracking = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-slate-900" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Live Tracking</h1>
-              <p className="text-slate-500 text-xs">{booking?.groomerId?.name || "Your Groomer"} · Grooming in progress</p>
+              <h1 className="page-title" style={{ margin: 0, fontSize: "1.25rem", color: 'var(--text)' }}>Live Tracking</h1>
+              <p className="page-subtitle" style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-soft)' }}>{booking?.groomerId?.name || "Your Groomer"} · Grooming in progress</p>
             </div>
           </div>
           {/* Status Display Area */}
@@ -182,7 +186,7 @@ const LiveTracking = () => {
       </div>
 
       {/* Map Section */}
-      <div className="relative border-y border-slate-100 shadow-inner" style={{ height: "500px", zIndex: 10 }}>
+      <div className="relative border border-slate-200 shadow-sm mx-auto rounded-3xl overflow-hidden mt-6 mb-6" style={{ height: "350px", maxWidth: "800px", zIndex: 10 }}>
         <MapContainer center={destPos} zoom={13} style={{ height: "100%", width: "100%" }} scrollWheelZoom={false}>
           <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <MapBounds points={allPoints} /> {/* Auto-zoom logic */}
@@ -225,7 +229,7 @@ const LiveTracking = () => {
                         isCurrent
                           ? { background: sCfg.color, color: "white", boxShadow: `0 0 0 3px ${sCfg.bg}` }
                           : isCompleted
-                          ? { background: "#0D9488", color: "white" }
+                          ? { background: "#002045", color: "white" }
                           : { background: "#F1F5F9", color: "#94A3B8" }
                       }
                     >
@@ -234,7 +238,7 @@ const LiveTracking = () => {
                     <span
                       className="whitespace-nowrap"
                       style={{
-                        color: isCurrent ? sCfg.color : isCompleted ? "#0D9488" : "#94A3B8",
+                        color: isCurrent ? sCfg.color : isCompleted ? "#002045" : "#94A3B8",
                         fontWeight: isCurrent ? 700 : 500,
                         fontSize: "0.65rem",
                       }}
@@ -244,7 +248,7 @@ const LiveTracking = () => {
                   </div>
                   {/* Connecting line between steps */}
                   {i < trackingStatuses.length - 1 && (
-                    <div className="h-0.5 w-8 sm:w-12 rounded-full mb-4" style={{ background: i < statusIndex ? "#0D9488" : "#E2E8F0" }} />
+                    <div className="h-0.5 w-8 sm:w-12 rounded-full mb-4" style={{ background: i < statusIndex ? "#002045" : "#E2E8F0" }} />
                   )}
                 </div>
               );
@@ -263,7 +267,7 @@ const LiveTracking = () => {
             {/* Address Summary Section */}
             <div className="space-y-2">
               <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <MapPin className="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
+                <MapPin className="w-4 h-4 text-[#002045] mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Destination</p>
                   <p className="text-slate-800 text-xs mt-0.5">{booking?.serviceLocation?.address || "Your Location"}</p>
@@ -284,8 +288,21 @@ const LiveTracking = () => {
             <button
               onClick={simulateMove}
               disabled={currentStep >= routePath.length - 1 && routePath.length > 0}
-              className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
-              style={{ background: "linear-gradient(135deg,#0D9488,#14B8A6)" }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: 'none',
+                borderRadius: '10px',
+                background: (currentStep >= routePath.length - 1 && routePath.length > 0) ? '#7a8ca5' : '#002045',
+                color: '#fff',
+                fontWeight: '700',
+                cursor: (currentStep >= routePath.length - 1 && routePath.length > 0) ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '16px'
+              }}
             >
               <Zap className="w-4 h-4" />
               {currentStep >= routePath.length - 1 && routePath.length > 0 ? "Groomer Arrived" : "Simulate Groomer Moving"}

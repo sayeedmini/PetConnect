@@ -11,7 +11,7 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // Custom Leaflet icon for the Destination marker (styled with Tailwind-like CSS)
 const destIcon = L.divIcon({
-  html: `<div style="background:linear-gradient(135deg,#0D9488,#14B8A6);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:3px solid white;box-shadow:0 3px 8px rgba(13,148,136,0.4);">D</div>`,
+  html: `<div style="background:linear-gradient(135deg,#002045,#002045);color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;border:3px solid white;box-shadow:0 3px 8px rgba(13,148,136,0.4);">D</div>`,
   className: "",
   iconSize: [32, 32],
   iconAnchor: [16, 16],
@@ -43,7 +43,7 @@ const ChangeView = ({ center }) => {
 };
 
 // Reusable Tailwind CSS class string for form inputs
-const inputClass = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-400 focus:bg-white focus:ring-2 focus:ring-teal-100 transition-all text-sm";
+const inputClass = "w-full px-4 py-3 rounded-full border border-slate-200 bg-slate-50 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#002045] focus:bg-white focus:ring-2 focus:ring-[#d1d5db] transition-all text-xs";
 
 /**
  * Reusable wrapper for form fields with label and icon
@@ -54,7 +54,7 @@ function FormField({ icon, label, required, children }) {
       <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide">
         <span className="text-slate-400">{icon}</span>
         {label}
-        {required && <span style={{ color: "#0D9488" }}>*</span>}
+        {required && <span style={{ color: "#002045" }}>*</span>}
       </label>
       {children}
     </div>
@@ -120,22 +120,26 @@ const BookingForm = () => {
   // Success View: shown after booking is confirmed
   if (booked) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-16 px-4">
-        <div className="bg-white rounded-3xl p-10 shadow-xl border border-slate-100 text-center max-w-md w-full">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "#CCFBF1" }}>
-            <CheckCircle className="w-10 h-10" style={{ color: "#0D9488" }} />
+      <div className="container app-shell" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '60px', paddingBottom: '60px',
+        background: 'var(--bg)', color: 'var(--text)',
+        '--bg': '#F7F9FB', '--surface': '#ffffff', '--text': '#002045', '--text-soft': '#0f172a', '--muted': '#334155', '--border': '#e2e8f0', '--primary': '#002045', '--primary-soft': '#84add5ff'
+      }}>
+        <div className="card spotlight-card" style={{ padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "#f4f7fb" }}>
+            <CheckCircle className="w-8 h-8" style={{ color: "#002045" }} />
           </div>
-          <h2 className="text-slate-900 mb-2" style={{ fontWeight: 800, fontSize: "1.5rem" }}>Booking Confirmed!</h2>
-          <p className="text-slate-500 mb-2 text-sm">Your appointment with <strong>{groomer?.name || "your groomer"}</strong> has been scheduled.</p>
-          <div className="bg-slate-50 rounded-xl p-4 mt-5 mb-6 text-left space-y-2">
-            <div className="flex items-center gap-2 text-sm text-slate-600"><User className="w-4 h-4 text-slate-400" /><span>{form.petOwnerName}</span></div>
-            <div className="flex items-center gap-2 text-sm text-slate-600"><Calendar className="w-4 h-4 text-slate-400" /><span>{form.date} at {form.time}</span></div>
-            <div className="flex items-center gap-2 text-sm text-slate-600"><MapPin className="w-4 h-4 text-slate-400" /><span>{form.address}</span></div>
+          <h2 className="text-slate-900 mb-2" style={{ fontWeight: 800, fontSize: "1.25rem" }}>Booking Confirmed!</h2>
+          <p className="text-slate-500 mb-6 text-xs">Your appointment with <strong>{groomer?.name || "your groomer"}</strong> has been scheduled successfully.</p>
+          <div className="bg-slate-50 rounded-2xl p-6 text-left space-y-3 mb-8">
+            <div className="flex items-center gap-3 text-xs text-slate-600 font-medium"><User className="w-4 h-4 text-[#002045]" /><span>{form.petOwnerName}</span></div>
+            <div className="flex items-center gap-3 text-xs text-slate-600 font-medium"><Calendar className="w-4 h-4 text-[#002045]" /><span>{form.date} at {form.time}</span></div>
+            <div className="flex items-center gap-3 text-xs text-slate-600 font-medium"><MapPin className="w-4 h-4 text-[#002045]" /><span>{form.address}</span></div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
             {/* Primary Action: Go to Tracking Page */}
-            <button onClick={() => navigate(`/grooming/track/${bookingId}`)} className="flex-1 py-3 rounded-xl text-white font-semibold text-sm" style={{ background: "linear-gradient(135deg,#0D9488,#14B8A6)" }}>Track Groomer</button>
-            <button onClick={() => navigate("/groomers")} className="flex-1 py-3 rounded-xl font-semibold text-sm border border-slate-200 text-slate-600 hover:bg-slate-50">Back Home</button>
+            <button onClick={() => navigate(`/grooming/track/${bookingId}`)} style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: '#002045', color: '#fff', fontWeight: '700', cursor: 'pointer' }}>Track Your Groomer</button>
+            <button onClick={() => navigate("/groomers")} style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '10px', background: '#fff', color: '#002045', fontWeight: '700', cursor: 'pointer' }}>View Other Groomers</button>
           </div>
         </div>
       </div>
@@ -144,27 +148,29 @@ const BookingForm = () => {
 
   // Primary Booking Form View
   return (
-    <div className="min-h-screen bg-slate-50 pt-16">
+    <div className="container app-shell" style={{
+      paddingTop: '20px', paddingBottom: '60px',
+      background: 'var(--bg)', color: 'var(--text)',
+      '--bg': '#F7F9FB', '--surface': '#ffffff', '--text': '#002045', '--text-soft': '#0f172a', '--muted': '#334155', '--border': '#e2e8f0', '--primary': '#002045', '--primary-soft': '#84add5ff'
+    }}>
       {/* Sub-header with back button */}
-      <div className="border-b border-slate-100 bg-white px-4 py-5">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <button onClick={() => navigate(groomerId ? `/groomers/${groomerId}` : "/groomers")} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="text-slate-900" style={{ fontWeight: 700, fontSize: "1.15rem" }}>Book Home Grooming</h1>
-            <p className="text-slate-500 text-sm">{groomer ? `with ${groomer.name} · ${groomer.address || ""}` : "Schedule your appointment"}</p>
-          </div>
+      <div className="card" style={{ padding: '16px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button onClick={() => navigate(groomerId ? `/groomers/${groomerId}` : "/groomers")} style={{ padding: '8px', borderRadius: '50%', background: 'var(--bg)', border: '1px solid var(--border)' }}>
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ margin: 0, fontSize: '1.25rem', color: 'var(--text)' }}>Confirm Booking</h1>
+          <p className="page-subtitle" style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-soft)' }}>{groomer ? `Selected Groomer: ${groomer.name}` : "Professional Home Grooming"}</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column: Form Inputs */}
-          <div className="space-y-6">
+          <div className="page-stack">
             {/* Personal Details Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <h2 className="text-slate-900 mb-5" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Your Details</h2>
+            <div className="card form-card">
+              <h2 className="page-title" style={{ fontSize: '1.15rem', color: 'var(--text)', marginBottom: '20px' }}>Your Details</h2>
               <div className="space-y-4">
                 <FormField icon={<User className="w-4 h-4" />} label="Your Name" required>
                   <input type="text" placeholder="e.g. Sakib Al Hasan" value={form.petOwnerName} onChange={(e) => setForm({ ...form, petOwnerName: e.target.value })} className={inputClass} />
@@ -189,47 +195,48 @@ const BookingForm = () => {
                 )}
               </div>
             </div>
-
-            {/* Location Confirmation Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <h2 className="text-slate-900 mb-1" style={{ fontWeight: 700, fontSize: "1.05rem" }}>Service Location</h2>
-              <p className="text-slate-400 text-xs mb-4">Type your area below, then fix your pin on the map.</p>
-              <FormField icon={<MapPin className="w-4 h-4" />} label="Address" required>
-                <input type="text" placeholder="e.g. Road 5, Block D, Bashundhara R/A" value={form.address} disabled={isLocked} onChange={(e) => setForm({ ...form, address: e.target.value })} onBlur={handleAddressBlur} className={inputClass} />
-              </FormField>
-              {/* Lock/Unlock Toggle Button */}
-              <button type="button" onClick={() => setIsLocked(!isLocked)} className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95"
-                style={isLocked ? { background: "#FEF3C7", color: "#D97706", border: "1px solid #FDE68A" } : { background: "linear-gradient(135deg,#0D9488,#14B8A6)", color: "white" }}>
-                {isLocked ? <><Unlock className="w-4 h-4" /> Unlock to Edit Pin</> : <><Lock className="w-4 h-4" /> Confirm Pin Location</>}
-              </button>
-              {isLocked && (
-                <div className="mt-3 flex items-center gap-2 text-xs font-medium" style={{ color: "#0D9488" }}>
-                  <CheckCircle className="w-3.5 h-3.5" />
-                  Location confirmed — {form.address || "Pin placed on map"}
-                </div>
-              )}
+            {/* Location Confirmation Card */}
+            <div className="card form-card" style={{ padding: '32px' }}>
+              <h2 className="page-title" style={{ fontSize: '1.15rem', color: 'var(--text)', marginBottom: '4px' }}>Service Location</h2>
+              <p className="page-subtitle" style={{ fontSize: '0.85rem', color: 'var(--text-soft)', marginBottom: '24px' }}>Type your area below, then fix your pin on the map.</p>
+              <div className="space-y-6">
+                <FormField icon={<MapPin className="w-4 h-4" />} label="Home Address" required>
+                  <input type="text" placeholder="e.g. Road 5, Block D, Bashundhara R/A" value={form.address} disabled={isLocked} onChange={(e) => setForm({ ...form, address: e.target.value })} onBlur={handleAddressBlur} className={inputClass} />
+                </FormField>
+                
+                {/* Lock/Unlock Toggle Button */}
+                <button type="button" onClick={() => setIsLocked(!isLocked)} style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: isLocked ? '#7a8ca5' : '#002045', color: '#fff', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  {isLocked ? <><Unlock className="w-3.5 h-3.5" /> Change Location Pin</> : <><Lock className="w-3.5 h-3.5" /> Confirm Pin on Map</>}
+                </button>
+                
+                {isLocked && (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-[#f4f7fb] border border-[#d1d5db] text-[11px] font-bold" style={{ color: "#002045" }}>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Location Verified & Confirmed</span>
+                  </div>
+                )}
+              </div>
             </div>
-
+ 
             {/* Main Submit Button */}
-            <button onClick={handleSubmit} disabled={!isFormValid || loading} className="w-full py-4 rounded-2xl font-semibold text-white text-base transition-all active:scale-95"
-              style={isFormValid && !loading ? { background: "linear-gradient(135deg,#0D9488,#14B8A6)", boxShadow: "0 8px 25px rgba(13,148,136,0.3)" } : { background: "#CBD5E1", cursor: "not-allowed" }}>
-              {loading ? "Confirming..." : isFormValid ? "Confirm Booking" : "Confirm Location to Proceed"}
+            <button onClick={handleSubmit} disabled={!isFormValid || loading} style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: (!isFormValid || loading) ? '#7a8ca5' : '#002045', color: '#fff', fontWeight: '700', cursor: (!isFormValid || loading) ? 'not-allowed' : 'pointer' }}>
+              {loading ? "Processing..." : isFormValid ? "Complete Booking" : "Confirm Pin to Continue"}
             </button>
           </div>
 
           {/* Right Column: Interactive Map */}
-          <div className="space-y-3">
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100" style={{ height: "520px" }}>
-              <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+          <div className="space-y-4">
+            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 relative z-0" style={{ height: "540px" }}>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50/50">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" style={{ color: "#0D9488" }} />
-                  <span className="text-slate-700 text-sm font-semibold">Location Map</span>
+                  <div className="w-2 h-2 rounded-full bg-[#f4f7fb]0 animate-pulse" />
+                  <span className="text-slate-700 text-xs font-bold uppercase tracking-wider">Set Service Pin</span>
                 </div>
-                {isLocked && <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: "#CCFBF1", color: "#0F766E" }}>📍 Pin Locked</span>}
+                {isLocked && <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#f4f7fb]0 text-white shadow-sm">Pin Secured</span>}
               </div>
-              <div style={{ height: "calc(100% - 52px)" }}>
+              <div style={{ height: "calc(100% - 53px)" }} className="relative z-0">
                 {/* Leaflet Map Component */}
-                <MapContainer center={selectedCoords} zoom={14} scrollWheelZoom={!isLocked} style={{ height: "100%", width: "100%" }}>
+                <MapContainer center={selectedCoords} zoom={14} scrollWheelZoom={!isLocked} style={{ height: "100%", width: "100%", zIndex: 0 }}>
                   <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                   <ChangeView center={selectedCoords} />
                   <LocationPicker position={selectedCoords} setPosition={setSelectedCoords} isLocked={isLocked} />

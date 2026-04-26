@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react"; // Import core React hooks for state and lifecycle management
-import { useNavigate } from "react-router-dom"; // Hook for programmatic navigation between pages
-import axios from "axios"; // HTTP client for making API requests to the backend
-import { Star, MapPin, ChevronDown, Search, ArrowRight, Sparkles } from "lucide-react"; // Modern icon library
-import ImageWithFallback from "../components/ImageWithFallback"; // Component to handle broken images gracefully
-import { getGroomerAvatar } from "../utils/groomerAvatar"; // Utility to get a random or specific avatar for groomers
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Star, MapPin, ChevronDown, Search, ArrowRight, Sparkles } from "lucide-react";
+import ImageWithFallback from "../components/ImageWithFallback";
+import { getGroomerAvatar } from "../utils/groomerAvatar";
 
-// API Base URL from environment variables or default to localhost
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-// Static list of grooming services for the filter dropdown
 const allServices = [
   "All Services",
   "Bath & Brush",
@@ -23,35 +21,32 @@ const allServices = [
 ];
 
 const GroomerDirectory = () => {
-  const [groomers, setGroomers] = useState([]); // State to store the list of groomers fetched from API
-  const [loading, setLoading] = useState(true); // State to track if data is currently being loaded
-  const [selectedService, setSelectedService] = useState("All Services"); // State for the active service filter
-  const [searchQuery, setSearchQuery] = useState(""); // State for the text search input
-  const navigate = useNavigate(); // Initialize navigation function
+  const [groomers, setGroomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState("All Services");
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  // Fetch groomers whenever the selectedService changes
   useEffect(() => {
     const fetchGroomers = async () => {
       try {
-        setLoading(true); // Show loading spinner
-        // Construct URL: filter by service if a specific one is selected, otherwise get all
+        setLoading(true);
         const url =
           selectedService !== "All Services"
             ? `${API}/api/groomers/search?service=${encodeURIComponent(selectedService)}`
             : `${API}/api/groomers/search`;
-        const { data } = await axios.get(url); // Perform GET request
-        setGroomers(data.data || []); // Update state with fetched groomer data
+        const { data } = await axios.get(url);
+        setGroomers(data.data || []);
       } catch (err) {
-        console.error("Error fetching groomers:", err); // Log errors for debugging
-        setGroomers([]); // Reset list on error to prevent crashes
+        console.error("Error fetching groomers:", err);
+        setGroomers([]);
       } finally {
-        setLoading(false); // Hide loading spinner
+        setLoading(false);
       }
     };
     fetchGroomers();
-  }, [selectedService]); // dependency array ensures this runs when service filter changes
+  }, [selectedService]);
 
-  // Client-side filtering based on search query (name or address)
   const filtered = groomers.filter((g) => {
     const matchesSearch =
       g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,78 +55,51 @@ const GroomerDirectory = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50"> {/* Main container with light background */}
-      {/* Hero Header Section with decorative gradients */}
-      <div
-        className="relative pt-28 pb-16 px-4 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #F0FDFA 0%, #E0F7F5 50%, #FFF7ED 100%)" }}
-      >
-        {/* Background decorative blobs (using radial gradients) */}
-        <div
-          className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-30 pointer-events-none"
-          style={{
-            background: "radial-gradient(circle, #99F6E4 0%, transparent 70%)",
-            transform: "translate(30%, -30%)",
-          }}
-        />
-        <div
-          className="absolute bottom-0 left-0 w-72 h-72 rounded-full opacity-20 pointer-events-none"
-          style={{
-            background: "radial-gradient(circle, #FED7AA 0%, transparent 70%)",
-            transform: "translate(-30%, 30%)",
-          }}
-        />
-
-        <div className="relative max-w-7xl mx-auto">
-          {/* Badge for branding/trust */}
-          <div className="flex items-center gap-2 mb-4">
-            <span
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-              style={{ background: "#CCFBF1", color: "#0F766E" }}
-            >
-              <Sparkles className="w-3 h-3" />
-              Trusted Pet Care in Bangladesh
-            </span>
+    <div className="container app-shell" style={{ 
+      paddingTop: '40px', 
+      background: 'var(--bg)', 
+      color: 'var(--text)',
+      '--bg': '#F7F9FB',
+      '--surface': '#ffffff',
+      '--text': '#002045',
+      '--text-soft': '#0f172a',
+      '--muted': '#334155',
+      '--border': '#e2e8f0',
+      '--primary': '#002045',
+      '--primary-soft': '#84add5ff',
+    }}>
+      {/* Hero Section */}
+      <div className="page-hero">
+        <div>
+          <div className="badge badge-soft" style={{ marginBottom: '16px' }}>
+            <Sparkles className="w-4 h-4" />
+            Trusted Pet Care
           </div>
-          {/* Main Hero Title */}
-          <h1
-            className="text-slate-900 mb-3"
-            style={{
-              fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.2,
-            }}
-          >
-            Find the perfect groomer
-            <br />
-            <span style={{ color: "#0D9488" }}>for your best bud.</span>
+          <h1 className="page-title" style={{ color: 'var(--text)' }}>
+            Find the perfect <span style={{ color: 'var(--primary)', fontWeight: '800' }}>groomer</span>
           </h1>
-          <p className="text-slate-500 max-w-xl" style={{ fontSize: "1.05rem" }}>
-            Browse verified, experienced groomers near you — book home grooming in minutes.
+          <p className="page-subtitle page-subtitle-lg" style={{ marginTop: '16px', color: 'var(--text-soft)', fontWeight: '500' }}>
+            Browse verified, experienced groomers near you — professional care delivered right to your doorstep.
           </p>
 
-          {/* Search & Filter Bar Row */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 max-w-2xl">
-            {/* Search Input Box */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <div className="toolbar" style={{ marginTop: '32px', marginBottom: '40px' }}>
+            <div style={{ position: 'relative', flex: 1, maxWidth: '300px' }}>
+              <Search className="w-4 h-4 text-muted" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
-                placeholder="Search groomers or area..."
+                placeholder="Search by name or area..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-800 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-200"
-                style={{ fontSize: "0.875rem" }}
+                className="input-surface"
+                style={{ paddingLeft: '42px' }}
               />
             </div>
-            {/* Service Filter Dropdown */}
-            <div className="relative">
+            <div style={{ position: 'relative', width: '200px' }}>
               <select
                 value={selectedService}
                 onChange={(e) => setSelectedService(e.target.value)}
-                className="appearance-none w-full sm:w-52 pl-4 pr-10 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-200 cursor-pointer"
-                style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                className="input-surface"
+                style={{ appearance: 'none', cursor: 'pointer' }}
               >
                 {allServices.map((s) => (
                   <option key={s} value={s}>
@@ -139,72 +107,60 @@ const GroomerDirectory = () => {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-muted" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Grid Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center justify-between mb-6">
-          {/* Result Count Message */}
-          <p className="text-slate-500 text-sm">
-            {loading ? (
-              "Loading groomers..."
-            ) : (
-              <>
-                Showing <span className="font-semibold text-slate-800">{filtered.length}</span> groomers
-                {selectedService !== "All Services" && (
-                  <>
-                    {" "}for{" "}
-                    <span className="font-semibold" style={{ color: "#0D9488" }}>
-                      "{selectedService}"
-                    </span>
-                  </>
-                )}
-              </>
-            )}
-          </p>
-        </div>
+      {/* Main Content */}
+      <div style={{ marginBottom: '80px' }}>
+        <p className="text-muted" style={{ marginBottom: '24px' }}>
+          {loading ? (
+            "Loading groomers..."
+          ) : (
+            <>
+              Showing <strong>{filtered.length}</strong> groomers
+              {selectedService !== "All Services" && (
+                <>
+                  {" "}for{" "}
+                  <strong style={{ color: "var(--primary)" }}>
+                    "{selectedService}"
+                  </strong>
+                </>
+              )}
+            </>
+          )}
+        </p>
 
-        {/* Conditional Rendering: Loading vs Empty vs Data */}
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div
-              className="w-10 h-10 rounded-full border-4 border-teal-100 border-t-teal-500 animate-spin"
-            />
+          <div className="spinner-wrapper">
+            <div className="spinner" />
           </div>
         ) : filtered.length === 0 ? (
-          /* Empty State UI */
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 bg-slate-100">
-              <Search className="w-8 h-8 text-slate-300" />
-            </div>
-            <h3 className="text-slate-700 mb-2" style={{ fontSize: "1.1rem", fontWeight: 600 }}>
-              No groomers found
-            </h3>
-            <p className="text-slate-400 text-sm max-w-xs">
+          <div className="info-panel card" style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <Search className="w-10 h-10 text-muted" style={{ margin: '0 auto 16px' }} />
+            <h3>No groomers found</h3>
+            <p style={{ maxWidth: '400px', margin: '0 auto 24px' }}>
               Try adjusting your filters or search term to find the right groomer.
             </p>
             <button
+              className="btn btn-secondary"
               onClick={() => {
                 setSelectedService("All Services");
                 setSearchQuery("");
               }}
-              className="mt-5 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: "#0D9488" }}
             >
               Clear Filters
             </button>
           </div>
         ) : (
-          /* Responsive Grid of Groomer Cards */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((g) => (
+          <div className="home-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+            {filtered.map((g, idx) => (
               <GroomerCard
                 key={g._id}
                 groomer={g}
+                index={idx}
                 onClick={() => navigate(`/groomers/${g._id}`)}
               />
             ))}
@@ -215,93 +171,61 @@ const GroomerDirectory = () => {
   );
 };
 
-/**
- * Sub-component for individual Groomer cards
- */
-function GroomerCard({ groomer, onClick }) {
+function GroomerCard({ groomer, index, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
+      className="card glass-card"
+      style={{
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        transition: 'var(--transition)'
+      }}
     >
-      {/* Top Image Section */}
-      <div className="relative h-52 overflow-hidden">
+      <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
         <ImageWithFallback
           src={getGroomerAvatar(groomer)}
           alt={groomer.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
-        {/* Subtle dark gradient overlay for better text contrast */}
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%)" }}
-        />
-        {/* Rating badge bottom-left on image */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-          <span className="text-white text-xs font-bold">{(groomer.rating ?? 4.9).toFixed(1)}</span>
-          <span className="text-white/80 text-xs">({groomer.reviewCount ?? 0})</span>
+        <div className="badge badge-warning" style={{ position: 'absolute', bottom: '12px', left: '12px', color: '#0f172a', fontWeight: '800', background: '#facc15' }}>
+          <Star className="w-3 h-3" style={{ fill: 'currentColor' }} />
+          {(groomer.rating ?? 4.9).toFixed(1)}
         </div>
-
-        {/* Experience badge top-right (Glassmorphism style) */}
         {groomer.experience && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-white/90 backdrop-blur-sm text-slate-800 shadow-sm">
+          <div className="badge" style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.5)', color: 'white' }}>
             {groomer.experience}
           </div>
         )}
       </div>
 
-      {/* Content Section below image */}
-      <div className="p-5">
-        <div className="flex items-start justify-between mb-2">
-          <div>
-            <h3 className="text-slate-900" style={{ fontWeight: 700 }}>
-              {groomer.name}
-            </h3>
-            {/* Address / Location Line */}
-            <div className="flex items-center gap-1 mt-0.5">
-              <MapPin className="w-3 h-3 text-slate-400" />
-              <span className="text-slate-500 text-xs">{groomer.address || "Location not specified"}</span>
-            </div>
-          </div>
-          {/* Verified Status Badge */}
-          <span
-            className="text-xs px-2.5 py-1 rounded-full font-medium shrink-0"
-            style={{ background: "#F0FDFA", color: "#0D9488" }}
-          >
-            Verified
-          </span>
+      <div className="card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', color: 'var(--text)' }}>
+          {groomer.name}
+        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-soft)', fontSize: '0.85rem', marginBottom: '16px' }}>
+          <MapPin className="w-3.5 h-3.5" />
+          {groomer.address || "Location not specified"}
         </div>
 
-        {/* Service Tags (displays first 3 services) */}
-        <div className="flex flex-wrap gap-1.5 mt-3 mb-4">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
           {groomer.services?.slice(0, 3).map((s, i) => (
-            <span
-              key={i}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100"
-            >
+            <span key={i} className="badge badge-soft" style={{ fontSize: '0.75rem', padding: '4px 8px' }}>
               {s}
             </span>
           ))}
-          {/* Count of additional services if more than 3 */}
-          {groomer.services?.length > 3 && (
-            <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-400 border border-slate-100">
-              +{groomer.services.length - 3}
-            </span>
-          )}
         </div>
 
-        {/* View Profile Action Button */}
-        <button
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-150 active:scale-95"
-          style={{ background: "linear-gradient(135deg, #0D9488, #14B8A6)" }}
-        >
-          View Profile
-          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-        </button>
+        <div style={{ marginTop: 'auto' }}>
+          <button style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '10px', background: '#002045', color: '#fff', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            View Profile <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-export default GroomerDirectory; // Export for use in routing
+export default GroomerDirectory;
