@@ -4,8 +4,9 @@ import axios from "axios";
 import { Star, MapPin, ChevronDown, Search, ArrowRight, Sparkles } from "lucide-react";
 import ImageWithFallback from "../components/ImageWithFallback";
 import { getGroomerAvatar } from "../utils/groomerAvatar";
+import { API_ORIGIN } from "../../../lib/apiBase";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 const allServices = [
   "All Services",

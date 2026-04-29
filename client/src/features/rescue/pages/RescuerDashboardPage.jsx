@@ -5,8 +5,9 @@ import RescueRequestCard from "../components/RescueRequestCard";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SiteLayout from "../../../components/SiteLayout";
+import { API_ORIGIN } from "../../../lib/apiBase";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 const socket = io(API);
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { API_ORIGIN } from "../../../lib/apiBase";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 const socket = io(API);
 const API_BASE_URL = `${API}/api/reports`;

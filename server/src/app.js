@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { getAllowedOrigins } = require('./config/origins');
+const { isAllowedOrigin } = require('./config/origins');
 
 const authRoutes = require('./routes/authRoutes');
 const vetRoutes = require('./routes/vetRoutes');
@@ -20,11 +20,9 @@ const catalogSubscriptionRoutes = require('./routes/catalogSubscriptionRoutes');
 const breedVerificationRoutes = require('./routes/breedVerificationRoutes');
 
 const app = express();
-const allowedOrigins = getAllowedOrigins();
-
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       return callback(null, true);
     }
 

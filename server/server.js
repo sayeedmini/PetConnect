@@ -5,18 +5,23 @@ const http = require('http');
 const { Server } = require('socket.io');
 const app = require('./src/app');
 const connectDB = require('./src/config/db');
-const { getAllowedOrigins } = require('./src/config/origins');
+const { getAllowedOrigins, isAllowedOrigin } = require('./src/config/origins');
 
 connectDB();
 
 const PORT = process.env.PORT || 5000;
-const allowedOrigins = getAllowedOrigins();
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin(origin, callback) {
+      if (isAllowedOrigin(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   },

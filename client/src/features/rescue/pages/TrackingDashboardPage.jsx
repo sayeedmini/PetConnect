@@ -9,8 +9,9 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import SiteLayout from "../../../components/SiteLayout";
+import { API_ORIGIN } from "../../../lib/apiBase";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 const socket = io(API);
 

@@ -5,9 +5,10 @@ import L from "leaflet"; // Core Leaflet library for icons and bounds
 import axios from "axios"; // HTTP client for API calls
 import { MapPin, Lock, Unlock, CheckCircle, ArrowLeft, User, Calendar, Clock, Home } from "lucide-react"; // UI Icons
 import { geocode } from "../utils/mockLocationService"; // Helper to convert address string to lat/lng coordinates
+import { API_ORIGIN } from "../../../lib/apiBase";
 
 // API Base URL from environment variables
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 // Custom Leaflet icon for the Destination marker (styled with Tailwind-like CSS)
 const destIcon = L.divIcon({
@@ -195,7 +196,8 @@ const BookingForm = () => {
                 )}
               </div>
             </div>
-            {/* Location Confirmation Card */}
+
+            {/* Location Confirmation Card */}
             <div className="card form-card" style={{ padding: '32px' }}>
               <h2 className="page-title" style={{ fontSize: '1.15rem', color: 'var(--text)', marginBottom: '4px' }}>Service Location</h2>
               <p className="page-subtitle" style={{ fontSize: '0.85rem', color: 'var(--text-soft)', marginBottom: '24px' }}>Type your area below, then fix your pin on the map.</p>

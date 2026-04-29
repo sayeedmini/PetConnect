@@ -6,9 +6,10 @@ import { io } from "socket.io-client"; // Socket.io client for real-time communi
 import axios from "axios"; // HTTP client for API requests
 import { Navigation, ArrowLeft, MapPin, Clock, ChevronRight, Zap } from "lucide-react"; // UI Icons
 import { getLiveRoute } from "../utils/mockLocationService"; // Helper to get coordinates for the route between two points
+import { API_ORIGIN } from "../../../lib/apiBase";
 
 // API Base URL
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 // Configuration for different booking statuses (labels, colors, and descriptions)
 const statusConfig = {

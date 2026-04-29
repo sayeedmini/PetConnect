@@ -7,8 +7,9 @@ import L from "leaflet";
 import { loginUser } from "../../auth/services/authApi";
 import { saveAuth } from "../../auth/utils/auth";
 import SiteLayout from "../../../components/SiteLayout";
+import { API_ORIGIN } from "../../../lib/apiBase";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_ORIGIN;
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
