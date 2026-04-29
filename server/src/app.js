@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { getAllowedOrigins } = require('./config/origins');
 
 const authRoutes = require('./routes/authRoutes');
 const vetRoutes = require('./routes/vetRoutes');
@@ -19,8 +20,21 @@ const catalogSubscriptionRoutes = require('./routes/catalogSubscriptionRoutes');
 const breedVerificationRoutes = require('./routes/breedVerificationRoutes');
 
 const app = express();
+const allowedOrigins = getAllowedOrigins();
 
-app.use(cors());
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 

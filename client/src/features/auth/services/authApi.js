@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_AUTH_BASE } from '../../../lib/apiBase';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api/auth',
+  baseURL: API_AUTH_BASE,
 });
 
 export const registerUser = async (formData) => {

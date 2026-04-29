@@ -4,6 +4,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import SubscriptionBox from '../components/SubscriptionBox';
 import BreedVerification from '../components/BreedVerification';
 import { getUser } from '../../auth/utils/auth';
+import { API_BASE } from '../../../lib/apiBase';
 
 function CatalogPage() {
     const [activeMainTab, setActiveMainTab] = useState('products');
@@ -37,7 +38,7 @@ function CatalogPage() {
 
     const currentUser = getUser();
     const userEmail = currentUser?.email || 'test@user.com';
-    const API_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:5000/api';
+    const API_URL = API_BASE;
 
     // Fetch products with filters
     const fetchProducts = async () => {
