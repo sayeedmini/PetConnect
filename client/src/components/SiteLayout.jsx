@@ -93,7 +93,7 @@ function SiteLayout({
   return (
     <div className="min-h-screen bg-[#F7F9FB] text-slate-900">
       <header className="sticky top-0 z-[100] border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-none items-center justify-between gap-4 px-1 py-4 sm:px-2 lg:px-3">
+        <div className="mx-auto flex w-full max-w-none flex-col gap-4 px-2 py-4 sm:px-3 lg:flex-row lg:items-center lg:justify-between lg:px-4">
           <div className="min-w-0 shrink-0">
             <Link to="/catalog" className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#002045] text-lg font-black text-white shadow-[0_16px_40px_rgba(0,32,69,0.18)]">
@@ -109,7 +109,7 @@ function SiteLayout({
           </div>
 
           <nav
-            className="mx-1 flex min-w-0 flex-1 justify-center gap-2 overflow-x-auto px-1"
+            className="flex w-full min-w-0 flex-wrap justify-start gap-2 sm:justify-center lg:flex-1"
             aria-label="Section navigation"
           >
           {visibleNavItems.map((item) => (
@@ -119,30 +119,21 @@ function SiteLayout({
 
           <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-3">
             {loggedIn ? (
-              <>
-                <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+              <div className="flex flex-col items-end gap-2">
+                <Link
+                  to="/login"
+                  onClick={handleLogout}
+                  className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition border border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
+                >
+                  Logout
+                </Link>
+
+                <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
                   <span className="font-semibold text-[#002045]">{user?.name || 'User'}</span>
-                  <span className="mx-2 text-slate-300">•</span>
+                  <span className="mx-1.5 text-slate-300">•</span>
                   <span className="capitalize">{user?.role || 'member'}</span>
                 </div>
-
-                {user?.role === 'petOwner' && (
-                  <Link
-                    to="/login"
-                    className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition border border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
-                  >
-                    Login as Rescuer
-                  </Link>
-                )}
-
-              <Link
-                to="/login"
-                onClick={handleLogout}
-                className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition border border-slate-200 bg-white text-slate-600 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
-              >
-                Logout
-              </Link>
-              </>
+              </div>
             ) : (
               <>
                 <Link

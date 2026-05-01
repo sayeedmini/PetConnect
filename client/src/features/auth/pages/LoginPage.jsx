@@ -89,23 +89,6 @@ function LoginPage() {
           Login
         </h1>
 
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          style={{
-            marginBottom: '16px',
-            padding: '10px 14px',
-            borderRadius: '10px',
-            border: '1px solid #d1d5db',
-            background: '#fff',
-            color: '#002045',
-            fontWeight: '600',
-            cursor: 'pointer',
-          }}
-        >
-          Back
-        </button>
-
         <p
           style={{
             marginBottom: '24px',
