@@ -33,18 +33,26 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={withLayout(<CatalogPage />)} />
-        <Route path="/catalog" element={withLayout(<CatalogPage />)} />
-        <Route path="/vets" element={<VetListPage />} />
-        <Route path="/vets/:id" element={<VetDetailsPage />} />
-        <Route path="/groomers" element={withLayout(<GroomerDirectoryPage />)} />
-        <Route path="/groomers/:id" element={withLayout(<GroomerDetailPage />)} />
-        <Route path="/groomers/:groomerId/book" element={withLayout(<GroomingBookingPage />)} />
-        <Route path="/grooming/track/:bookingId" element={withLayout(<GroomingLiveTrackingPage />)} />
-        <Route path="/grooming/subscriptions" element={withLayout(<SubscriptionHubPage />)} />
-        <Route path="/subscriptions" element={withLayout(<SubscriptionHubPage />)} />
-        <Route path="/rescue/report" element={<EmergencyReportPage />} />
-        <Route path="/rescue/report-success" element={<ReportSuccessPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/prescriptions/verify/:verificationCode"
+          element={<PrescriptionVerificationPage />}
+        />
+
+        {/* All routes below require login */}
+        <Route path="/" element={<ProtectedRoute><SiteLayout><CatalogPage /></SiteLayout></ProtectedRoute>} />
+        <Route path="/catalog" element={<ProtectedRoute><SiteLayout><CatalogPage /></SiteLayout></ProtectedRoute>} />
+        <Route path="/vets" element={<ProtectedRoute><VetListPage /></ProtectedRoute>} />
+        <Route path="/vets/:id" element={<ProtectedRoute><VetDetailsPage /></ProtectedRoute>} />
+        <Route path="/groomers" element={<ProtectedRoute>{withLayout(<GroomerDirectoryPage />)}</ProtectedRoute>} />
+        <Route path="/groomers/:id" element={<ProtectedRoute>{withLayout(<GroomerDetailPage />)}</ProtectedRoute>} />
+        <Route path="/groomers/:groomerId/book" element={<ProtectedRoute>{withLayout(<GroomingBookingPage />)}</ProtectedRoute>} />
+        <Route path="/grooming/track/:bookingId" element={<ProtectedRoute>{withLayout(<GroomingLiveTrackingPage />)}</ProtectedRoute>} />
+        <Route path="/grooming/subscriptions" element={<ProtectedRoute>{withLayout(<SubscriptionHubPage />)}</ProtectedRoute>} />
+        <Route path="/subscriptions" element={<ProtectedRoute>{withLayout(<SubscriptionHubPage />)}</ProtectedRoute>} />
+        <Route path="/rescue/report" element={<ProtectedRoute><EmergencyReportPage /></ProtectedRoute>} />
+        <Route path="/rescue/report-success" element={<ProtectedRoute><ReportSuccessPage /></ProtectedRoute>} />
         <Route
   path="/rescue/dashboard"
   element={
@@ -55,13 +63,6 @@ function App() {
 />
         <Route path="/rescue/tracking" element={<TrackingDashboardPage />} />
         <Route path="/rescue/insights" element={<RescueInsightsPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/prescriptions/verify/:verificationCode"
-          element={<PrescriptionVerificationPage />}
-        />
-
         <Route
           path="/vets/add"
           element={

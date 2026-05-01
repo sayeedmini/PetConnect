@@ -6,7 +6,7 @@ import { saveAuth } from '../utils/auth';
 function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from || '/vets';
+  const redirectTo = location.state?.from || '/catalog';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -80,7 +80,6 @@ function RegisterPage() {
         saveAuth(data.token, data.user);
       }
 
-      alert('Registration successful');
       navigate(redirectTo, { replace: true });
     } catch (error) {
       alert(error?.response?.data?.message || 'Registration failed');

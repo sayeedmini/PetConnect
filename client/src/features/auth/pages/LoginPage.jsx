@@ -6,7 +6,7 @@ import { saveAuth } from '../utils/auth';
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from || '/vets';
+  const redirectTo = location.state?.from || '/catalog';
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,6 @@ function LoginPage() {
     try {
       const data = await loginUser(formData);
       saveAuth(data.token, data.user);
-      alert('Login successful');
       navigate(redirectTo, { replace: true });
     } catch (error) {
       alert(error?.response?.data?.message || 'Login failed');

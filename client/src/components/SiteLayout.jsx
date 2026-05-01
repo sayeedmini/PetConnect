@@ -3,24 +3,24 @@ import { getUser, isLoggedIn, logout } from '../features/auth/utils/auth';
 
 const sectionNavItems = {
   home: [
-    { to: '/', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
+    { to: '/catalog', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
     { to: '/vets', label: 'Clinics', match: (pathname) => pathname.startsWith('/vets') },
     { to: '/groomers', label: 'Groomers', match: (pathname) => pathname.startsWith('/groomers') || pathname.startsWith('/grooming') || pathname === '/subscriptions' },
     { to: '/rescue/report', label: 'Rescue', match: (pathname) => pathname.startsWith('/rescue') },
   ],
   vets: [
-    { to: '/', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
+    { to: '/catalog', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
     { to: '/vets', label: 'Clinics', match: (pathname) => pathname.startsWith('/vets') },
     { to: '/appointments', label: 'Appointment', match: (pathname) => pathname.startsWith('/appointments') },
     { to: '/prescriptions', label: 'Prescription', match: (pathname) => pathname.startsWith('/prescriptions') },
   ],
   groomers: [
-    { to: '/', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
+    { to: '/catalog', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
     { to: '/groomers', label: 'Groomers', match: (pathname) => pathname.startsWith('/groomers') },
     { to: '/grooming/subscriptions', label: 'Subscription', match: (pathname) => pathname.startsWith('/grooming/subscriptions') || pathname === '/subscriptions' },
   ],
   rescue: [
-    { to: '/', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
+    { to: '/catalog', label: 'Home', match: (pathname) => pathname === '/' || pathname === '/catalog' },
     { to: '/rescue/report', label: 'Report Rescue', match: (pathname) => pathname === '/rescue/report' || pathname === '/rescue/report-success' },
     { to: '/rescue/dashboard', label: 'Dashboard', roles: ['rescuer'], match: (pathname) => pathname === '/rescue/dashboard' },
     { to: '/rescue/tracking', label: 'Tracking', roles: ['rescuer', 'petOwner'], match: (pathname) => pathname === '/rescue/tracking' },
@@ -95,7 +95,7 @@ function SiteLayout({
       <header className="sticky top-0 z-[100] border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-none items-center justify-between gap-4 px-1 py-4 sm:px-2 lg:px-3">
           <div className="min-w-0 shrink-0">
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/catalog" className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#002045] text-lg font-black text-white shadow-[0_16px_40px_rgba(0,32,69,0.18)]">
                 P
               </div>
@@ -217,7 +217,7 @@ function SiteLayout({
           <div>
             <div className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">Explore</div>
             <div className="mt-4 space-y-3 text-sm text-slate-600">
-              <Link className="block hover:text-teal-700" to="/">
+              <Link className="block hover:text-teal-700" to="/catalog">
                 Product Catalog
               </Link>
               <Link className="block hover:text-teal-700" to="/vets">
